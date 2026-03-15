@@ -84,10 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
           displayName, college, program,
           photoURL: user.photoURL || "",
           isProfileComplete: true,
-          isBlocked: false,
-          createdAt: serverTimestamp(),
-          role: ADMIN_EMAILS.includes(user.email) ? "admin" : "visitor",
-        });
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
 
         const snap = await getDoc(doc(db, "users", user.uid));
         const data = snap.data();
