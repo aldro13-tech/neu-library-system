@@ -54,7 +54,7 @@ export async function loginWithGoogle() {
         email: user.email,
         displayName: user.displayName || "",
         photoURL: user.photoURL || "",
-        role: ADMIN_EMAILS.includes(user.email) ? "admin" : "visitor",
+        role: "visitor",
         isBlocked: false,
         createdAt: serverTimestamp(),
         isProfileComplete: false,
