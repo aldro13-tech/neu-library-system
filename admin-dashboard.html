@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEU Library – Admin Dashboard</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="icon" href="assets/neu-logo.png" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <!-- jsPDF + AutoTable for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<!-- ── Loading Overlay ───────────────────────────────────── -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- ── Sidebar ───────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <img src="assets/neu-logo.png" alt="NEU Logo" class="sidebar-logo-mark" />
+      <div class="sidebar-logo-text">
+        <div class="title">NEU Library</div>
+        <div class="subtitle">Admin Panel</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a href="#overview" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Dashboard
+    </a>
+
+    <div class="nav-section-label">Analytics</div>
+    <a href="#visit-log" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+        <rect x="9" y="3" width="6" height="4" rx="1"/>
+        <line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
+      </svg>
+      Visit Log
+    </a>
+    <a href="#college-breakdown" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a10 10 0 010 20V12l7-7"/>
+      </svg>
+      By College
+    </a>
+
+    <div class="nav-section-label">Management</div>
+    <a href="#user-mgmt" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+      Users
+    </a>
+  </nav>
+
+  <div class="sidebar-admin">
+    <div class="admin-info">
+      <div class="admin-avatar" id="admin-initials">A</div>
+      <div class="admin-info-text">
+        <div class="name" id="admin-name">Administrator</div>
+        <div class="role">Library Admin</div>
+      </div>
+    </div>
+    <button class="btn-logout" id="logout-btn">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- ── Main Content ───────────────────────────────────────── -->
+<main class="main-content">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-title">📊 Visitor Statistics Dashboard</div>
+
+    <div class="filter-group">
+      <select class="filter-select" id="date-filter">
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month" selected>This Month</option>
+        <option value="custom">Custom Range</option>
+      </select>
+
+      <div class="custom-range" id="custom-range">
+        <input type="date" class="date-input" id="date-from" />
+        <span style="font-size:0.8rem; color:#999;">to</span>
+        <input type="date" class="date-input" id="date-to" />
+        <button class="btn-apply" id="apply-custom">Apply</button>
+      </div>
+
+      <button class="btn-pdf" id="pdf-export-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Dashboard body -->
+  <div class="dashboard-body">
+
+    <!-- ── Stat Cards ──────────────────────────────────── -->
+    <div class="stat-cards" id="overview">
+      <div class="stat-card">
+        <div class="stat-label">Total Visits (Period)</div>
+        <div class="stat-value" id="stat-total">—</div>
+        <div class="stat-sub">Logged library entries</div>
+      </div>
+      <div class="stat-card gold-accent">
+        <div class="stat-label">Colleges Represented</div>
+        <div class="stat-value" id="stat-colleges">—</div>
+        <div class="stat-sub">Unique colleges/offices</div>
+      </div>
+      <div class="stat-card green-accent">
+        <div class="stat-label">Visits Today</div>
+        <div class="stat-value" id="stat-today">—</div>
+        <div class="stat-sub">Current day entries</div>
+      </div>
+      <div class="stat-card light-accent">
+        <div class="stat-label">Top Purpose</div>
+        <div class="stat-value" id="stat-top-purpose" style="font-size:1rem; padding-top:8px;">—</div>
+        <div class="stat-sub">Most common visit reason</div>
+      </div>
+    </div>
+
+    <!-- ── Charts Row ─────────────────────────────────── -->
+    <div class="charts-row">
+      <!-- Daily bar chart -->
+      <div class="chart-card" id="college-breakdown">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-title">Daily Visitor Count</div>
+            <div class="chart-subtitle">Number of visits per day in the selected period</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="daily-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- College doughnut -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-title">By College</div>
+            <div class="chart-subtitle">Visitor breakdown per college/dept.</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="college-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Bottom Row ──────────────────────────────────── -->
+    <div class="bottom-row">
+
+      <!-- Visit log table -->
+      <div class="table-card" id="visit-log">
+        <div class="table-card-header">
+          <div class="table-title">Recent Visit Log</div>
+          <span style="font-size:0.75rem; color:#9AA3B2;">Showing up to 50 entries</span>
+        </div>
+        <div class="table-scroll">
+          <table class="visit-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>School ID</th>
+                <th>College</th>
+                <th>Purpose</th>
+                <th>Check-in Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="visit-table-body">
+              <tr>
+                <td colspan="6" class="no-data">Loading data…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- User management -->
+      <div class="user-mgmt-card" id="user-mgmt">
+        <div class="user-search-header">
+          <div class="user-search-title">User Management</div>
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input
+              type="text"
+              class="user-search-input"
+              id="user-search-input"
+              placeholder="Search by name, email, or school ID…"
+            />
+          </div>
+        </div>
+        <div class="user-search-results" id="user-search-results">
+          <p class="no-results">Type above to search for a user.</p>
+        </div>
+      </div>
+
+    </div><!-- /.bottom-row -->
+
+  </div><!-- /.dashboard-body -->
+</main>
+
+<!-- Admin dashboard JS -->
+<script type="module">
+  import { allVisits, aggregateByCollege, aggregateByPurpose } from './js/admin-dashboard.js';
+  import { generatePDFReport } from './js/pdf-report.js';
+
+  document.getElementById('pdf-export-btn').addEventListener('click', () => {
+    const filterVal = document.getElementById('date-filter').value;
+    const labelMap = {
+      today: 'Today',
+      week: 'This Week',
+      month: 'This Month',
+      custom: (() => {
+        const f = document.getElementById('date-from').value;
+        const t = document.getElementById('date-to').value;
+        return f && t ? `${f} to ${t}` : 'Custom Range';
+      })(),
+    };
+    generatePDFReport(allVisits, labelMap[filterVal] || 'Selected Period');
+  });
+
+  // Admin initials
+  const adminName = document.getElementById('admin-name').textContent;
+  const initialsEl = document.getElementById('admin-initials');
+  if (adminName && initialsEl) {
+    const parts = adminName.trim().split(' ');
+    initialsEl.textContent = parts.map(p => p[0]).join('').slice(0,2).toUpperCase();
+  }
+</script>
+
+<script type="module" src="js/admin-dashboard.js"></script>
+
+</body>
+</html>

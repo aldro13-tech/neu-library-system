@@ -1,0 +1,33 @@
+# ── Node / npm ───────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Firebase CLI ─────────────────────────────────────────────
+.firebase/
+.firebaserc
+
+# ── Environment / Secrets ────────────────────────────────────
+# Never commit real API keys — keep them in firebase-config.js
+# only after adding that file to .gitignore if keys are sensitive,
+# OR use environment variable injection via a build tool.
+# For a fully static site using Firebase JS SDK (public keys),
+# committing firebase-config.js is acceptable per Google's guidance.
+# Reference: https://firebase.google.com/docs/projects/api-keys
+
+# ── OS files ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editor files ─────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.user
+
+# ── Build artifacts ──────────────────────────────────────────
+dist/
+build/
+*.min.js.map

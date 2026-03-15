@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEU Library – Visitor Login</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="icon" href="assets/neu-logo.png" />
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- ── Left Panel: Login Form ─────────────────────────── -->
+  <aside class="left-panel">
+    <div class="left-panel-inner">
+
+      <!-- Header / Logo -->
+      <header class="neu-header">
+        <img src="assets/neu-logo.png" alt="NEU Logo" class="neu-logo-mark" />
+        <div class="neu-title">
+          <span class="school-name">New Era University</span>
+          <span class="system-name">Library Visitor System</span>
+        </div>
+      </header>
+
+      <!-- Page title -->
+      <h1 class="page-title">Welcome Back</h1>
+      <p class="page-subtitle">Sign in with your NEU institutional account to continue.</p>
+
+      <!-- Error message -->
+      <div class="error-msg" id="error-msg" role="alert"></div>
+
+      <!-- Google Sign-In -->
+      <button class="btn btn-google" id="google-login-btn" type="button">
+        <img
+          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+          alt="Google"
+          width="20"
+          height="20"
+        />
+        Sign in with Google (@neu.edu.ph)
+      </button>
+
+      <div class="divider">or continue with ID / Email</div>
+
+      <!-- Manual Login (ID / Email) -->
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="login-id">School ID or Institutional Email <span class="req">*</span></label>
+          <input
+            type="text"
+            id="login-id"
+            name="login-id"
+            placeholder="2021-XXXXX or juan@neu.edu.ph"
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password <span class="req">*</span></label>
+          <input
+            type="password"
+            id="login-password"
+            name="login-password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button class="btn btn-primary" type="submit" id="login-submit-btn">
+          Sign In
+        </button>
+      </form>
+
+      <footer class="page-footer">
+        Don't have an account?
+        <a href="register.html" id="go-to-register">Register here</a>
+        <br /><br />
+        <small>Only <strong>@neu.edu.ph</strong> accounts are accepted.</small>
+      </footer>
+
+    </div>
+  </aside>
+
+  <!-- ── Right Panel: Decorative ────────────────────────── -->
+  <section class="right-panel" aria-hidden="true">
+    <div class="right-tagline">
+      <h2>
+        NEU Library
+        <span>Visitor Portal</span>
+      </h2>
+      <p>
+        Empowering New Era University students and faculty with a seamless
+        library access experience. Your knowledge journey starts here.
+      </p>
+    </div>
+  </section>
+
+</div><!-- /.page-wrapper -->
+
+<!-- Firebase SDK (ESM) -->
+<script type="module">
+  import { loginWithGoogle } from './js/auth.js';
+  import {
+    auth,
+    db,
+    onAuthStateChanged,
+    doc,
+    getDoc,
+    signInWithPopup,
+    ALLOWED_DOMAIN,
+  } from './js/firebase-config.js';
+  import {
+    signInWithEmailAndPassword,
+    getAuth,
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+  // ── Google login ──────────────────────────────────────────
+  document.getElementById('google-login-btn').addEventListener('click', loginWithGoogle);
+
+  // ── Manual login (Email/Password via Firebase Auth) ───────
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errorEl = document.getElementById('error-msg');
+    errorEl.style.display = 'none';
+
+    let identifier = document.getElementById('login-id').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!identifier || !password) {
+      errorEl.textContent = 'Please enter your ID/email and password.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    // If user typed a numeric ID, look up their email in Firestore
+    // (Requires a server-side lookup or pre-stored email mapping)
+    if (!identifier.includes('@')) {
+      // Try to find user by schoolId in Firestore
+      const { collection, query, where, getDocs } = await import(
+        'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'
+      );
+      const q = query(
+        collection(db, 'users'),
+        where('schoolId', '==', identifier)
+      );
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        errorEl.textContent = 'No account found with that School ID.';
+        errorEl.style.display = 'block';
+        return;
+      }
+      identifier = snap.docs[0].data().email;
+    }
+
+    // Domain check
+    if (!identifier.endsWith(ALLOWED_DOMAIN)) {
+      errorEl.textContent = `Only ${ALLOWED_DOMAIN} accounts are allowed.`;
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    const submitBtn = document.getElementById('login-submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing in…';
+
+    try {
+      const { signInWithEmailAndPassword } = await import(
+        'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'
+      );
+      const cred = await signInWithEmailAndPassword(auth, identifier, password);
+      const userSnap = await getDoc(doc(db, 'users', cred.user.uid));
+      if (!userSnap.exists()) { window.location.href = 'register.html'; return; }
+      const userData = userSnap.data();
+      if (userData.isBlocked) {
+        const { signOut } = await import(
+          'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'
+        );
+        await signOut(auth);
+        errorEl.textContent = 'Your access has been blocked. Contact library staff.';
+        errorEl.style.display = 'block';
+        return;
+      }
+      window.location.href = userData.role === 'admin'
+        ? 'admin-dashboard.html'
+        : 'checkin.html';
+    } catch (err) {
+      const msgs = {
+        'auth/user-not-found': 'No account found with this email.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/too-many-requests': 'Too many attempts. Try again later.',
+      };
+      errorEl.textContent = msgs[err.code] || 'Login failed. Please try again.';
+      errorEl.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In';
+    }
+  });
+
+  // ── Redirect if already logged in ────────────────────────
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists()) return;
+    const data = snap.data();
+    if (data.isBlocked) return;
+    if (!data.isProfileComplete) { window.location.href = 'register.html'; return; }
+    window.location.href = data.role === 'admin' ? 'admin-dashboard.html' : 'checkin.html';
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NEU Library – UI Preview (No Firebase)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<link rel="icon" href="assets/neu-logo.png" />
+<style>
+:root {
+  --blue-dark:#0A2463;--blue-mid:#1A4B9B;--blue-light:#2E6FD9;--blue-pale:#E8F0FE;
+  --gold:#F9C61F;--gold-dark:#D4A200;--white:#FFFFFF;
+  --gray-100:#F5F7FA;--gray-200:#E8EBF0;--gray-400:#9AA3B2;--gray-700:#444D60;
+  --red:#D32F2F;--green:#1B8B3E;
+  --font-d:'Playfair Display',serif;--font-b:'Source Sans 3',sans-serif;
+  --r:12px;--rs:8px;--shadow:0 8px 32px rgba(10,36,99,0.13);--tr:0.22s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;}
+body{font-family:var(--font-b);background:#0A1628;color:var(--gray-700);min-height:100vh;}
+
+/* ── Screen switcher tabs ────────────────────────────────── */
+.preview-bar{
+  background:rgba(255,255,255,0.06);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  padding:0 20px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  overflow-x:auto;
+  position:sticky;top:0;z-index:999;
+}
+.preview-bar-title{
+  font-family:var(--font-d);font-size:0.85rem;font-weight:700;
+  color:var(--gold);white-space:nowrap;margin-right:12px;flex-shrink:0;
+}
+.tab-btn{
+  padding:12px 16px;background:transparent;border:none;
+  border-bottom:3px solid transparent;
+  color:rgba(255,255,255,0.55);font-family:var(--font-b);font-size:0.82rem;
+  font-weight:600;cursor:pointer;transition:all var(--tr);white-space:nowrap;
+  flex-shrink:0;
+}
+.tab-btn:hover{color:var(--white);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* ── Screen panels ───────────────────────────────────────── */
+.screen{display:none;min-height:calc(100vh - 47px);}
+.screen.active{display:block;}
+
+/* ═════════════════════════════════════════
+   SCREEN 1 – LOGIN
+══════════════════════════════════════════ */
+.s-login{display:flex;min-height:calc(100vh - 47px);}
+.left-panel{
+  width:460px;min-width:300px;background:var(--white);
+  display:flex;flex-direction:column;
+  box-shadow:4px 0 40px rgba(10,36,99,0.18);
+}
+.lp-inner{padding:36px 40px 28px;display:flex;flex-direction:column;flex:1;}
+.neu-header{display:flex;align-items:center;gap:12px;padding-bottom:24px;border-bottom:2px solid var(--gold);margin-bottom:28px;}
+.neu-logo-mark{
+  width:52px;height:52px;background:var(--blue-dark);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-family:var(--font-d);font-size:1.3rem;font-weight:700;color:var(--gold);
+  border:3px solid var(--gold);
+}
+.neu-title .school{font-family:var(--font-d);font-size:0.92rem;font-weight:700;color:var(--blue-dark);}
+.neu-title .sys{font-size:0.72rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.page-title{font-family:var(--font-d);font-size:1.6rem;font-weight:700;color:var(--blue-dark);margin-bottom:4px;}
+.page-sub{font-size:0.86rem;color:var(--gray-400);margin-bottom:24px;}
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-size:0.78rem;font-weight:700;color:var(--blue-dark);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+.fg input,.fg select{
+  width:100%;padding:10px 13px;border:1.5px solid var(--gray-200);border-radius:var(--rs);
+  font-family:var(--font-b);font-size:0.92rem;color:var(--gray-700);background:var(--gray-100);
+  outline:none;transition:border-color var(--tr);appearance:none;
+}
+.fg input:focus,.fg select:focus{border-color:var(--blue-mid);background:var(--white);}
+.fg input::placeholder{color:var(--gray-400);}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  padding:12px 20px;border:none;border-radius:var(--rs);font-family:var(--font-b);
+  font-size:0.92rem;font-weight:700;cursor:pointer;width:100%;letter-spacing:.3px;
+  transition:all var(--tr);text-decoration:none;
+}
+.btn-primary{background:var(--blue-dark);color:var(--white);box-shadow:0 4px 14px rgba(10,36,99,0.25);}
+.btn-primary:hover{background:var(--blue-mid);transform:translateY(-1px);}
+.btn-google{background:var(--white);color:var(--gray-700);border:1.5px solid var(--gray-200);box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.btn-google:hover{background:var(--gray-100);border-color:var(--blue-light);}
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--gray-400);font-size:0.8rem;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gray-200);}
+.page-footer{margin-top:auto;padding-top:20px;border-top:1px solid var(--gray-200);font-size:0.82rem;color:var(--gray-400);text-align:center;}
+.page-footer a{color:var(--blue-mid);font-weight:600;text-decoration:none;cursor:pointer;}
+.page-footer a:hover{text-decoration:underline;}
+
+/* Right decorative panel */
+.right-panel{
+  flex:1;
+  background:linear-gradient(160deg,rgba(10,36,99,0.9),rgba(26,75,155,0.7)),
+    repeating-linear-gradient(45deg,rgba(249,198,31,0.04) 0,rgba(249,198,31,0.04) 1px,transparent 1px,transparent 20px);
+  display:flex;align-items:center;justify-content:center;padding:40px;
+}
+.right-tag{text-align:center;color:var(--white);}
+.right-tag h2{font-family:var(--font-d);font-size:2.5rem;font-weight:700;line-height:1.2;text-shadow:0 3px 20px rgba(0,0,0,.4);margin-bottom:14px;}
+.right-tag h2 span{color:var(--gold);display:block;}
+.right-tag p{font-size:1rem;opacity:.85;max-width:360px;line-height:1.7;}
+
+/* ═════════════════════════════════════════
+   SCREEN 2 – REGISTER
+══════════════════════════════════════════ */
+.s-reg{display:flex;min-height:calc(100vh - 47px);}
+.form-row-3{display:grid;grid-template-columns:1fr 68px 1fr;gap:9px;}
+
+/* ═════════════════════════════════════════
+   SCREEN 3 – CHECK-IN
+══════════════════════════════════════════ */
+.s-checkin{display:flex;min-height:calc(100vh - 47px);}
+.user-bar{
+  display:flex;align-items:center;gap:12px;background:var(--blue-dark);
+  padding:14px 20px;border-radius:var(--r);margin-bottom:24px;
+}
+.u-avatar{
+  width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);
+  background:var(--blue-mid);display:flex;align-items:center;justify-content:center;
+  color:var(--gold);font-weight:700;font-size:1rem;flex-shrink:0;
+}
+.u-name{font-weight:700;color:var(--white);font-size:0.95rem;}
+.u-sub{font-size:0.78rem;color:var(--gold);opacity:.9;}
+.btn-sm-out{
+  background:transparent;border:1.5px solid rgba(255,255,255,.3);color:var(--white);
+  padding:6px 13px;border-radius:6px;font-size:0.78rem;font-weight:600;cursor:pointer;
+  transition:all var(--tr);font-family:var(--font-b);margin-left:auto;
+}
+.btn-sm-out:hover{background:rgba(255,255,255,.1);border-color:var(--gold);color:var(--gold);}
+.purpose-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px;}
+.p-radio{display:none;}
+.p-label{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  padding:14px 9px;border:2px solid var(--gray-200);border-radius:var(--rs);
+  cursor:pointer;transition:all var(--tr);text-align:center;font-size:0.76rem;
+  font-weight:600;color:var(--gray-700);background:var(--gray-100);
+}
+.p-label:hover{border-color:var(--blue-mid);background:var(--blue-pale);color:var(--blue-dark);}
+.p-radio:checked + .p-label{border-color:var(--blue-dark);background:var(--blue-dark);color:var(--white);box-shadow:0 4px 12px rgba(10,36,99,.22);}
+.p-icon{font-size:1.4rem;line-height:1;}
+.btn-gold{background:var(--gold);color:var(--blue-dark);font-weight:700;box-shadow:0 4px 14px rgba(249,198,31,.35);}
+.btn-gold:hover{background:var(--gold-dark);}
+.steps{display:flex;gap:5px;margin-bottom:22px;}
+.s-dot{width:7px;height:7px;border-radius:50%;background:var(--gray-200);}
+.s-dot.done{background:var(--gold);}
+.s-dot.active{background:var(--blue-dark);}
+
+/* ═════════════════════════════════════════
+   SCREEN 4 – WELCOME
+══════════════════════════════════════════ */
+.s-welcome{
+  display:flex;align-items:center;justify-content:center;
+  min-height:calc(100vh - 47px);background:var(--blue-dark);padding:24px;
+  position:relative;overflow:hidden;
+}
+.confetti-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.w-card{
+  background:var(--white);border-radius:20px;padding:44px 48px;
+  max-width:540px;width:100%;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);position:relative;z-index:1;
+  animation:wIn 0.6s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes wIn{from{opacity:0;transform:scale(.85) translateY(30px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.w-card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--blue-dark),var(--blue-light),var(--gold));border-radius:20px 20px 0 0;}
+.w-icon{
+  width:86px;height:86px;background:linear-gradient(135deg,var(--green),#27AE60);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  margin:0 auto 22px;box-shadow:0 8px 24px rgba(27,139,62,.35);position:relative;
+}
+.w-icon svg{width:44px;height:44px;}
+.pulse{position:absolute;inset:-8px;border-radius:50%;border:3px solid rgba(27,139,62,.3);animation:pulse 2s ease-out infinite;}
+@keyframes pulse{0%{transform:scale(1);opacity:1;}100%{transform:scale(1.35);opacity:0;}}
+.w-stamp{display:inline-block;background:var(--blue-dark);color:var(--gold);font-family:var(--font-d);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:5px 14px;border-radius:20px;margin-bottom:14px;}
+.w-title{font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--blue-dark);margin-bottom:5px;line-height:1.2;}
+.w-sub{font-size:1rem;color:var(--green);font-weight:600;margin-bottom:24px;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;text-align:left;}
+.chip{background:var(--blue-pale);border-radius:9px;padding:12px 14px;border-left:4px solid var(--blue-dark);}
+.chip.full{grid-column:1/-1;}
+.chip .lbl{font-size:0.69rem;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);font-weight:600;margin-bottom:3px;}
+.chip .val{font-size:0.9rem;font-weight:700;color:var(--blue-dark);}
+.w-time{font-size:0.82rem;color:var(--gray-400);margin-bottom:24px;}
+.cd-text{font-size:0.78rem;color:var(--gray-400);margin-top:12px;}
+.cd-text span{font-weight:700;color:var(--blue-mid);}
+
+/* ═════════════════════════════════════════
+   SCREEN 5 – ADMIN DASHBOARD
+══════════════════════════════════════════ */
+.s-admin{display:flex;min-height:calc(100vh - 47px);}
+.sidebar{
+  width:248px;background:var(--blue-dark);min-height:100%;
+  display:flex;flex-direction:column;flex-shrink:0;
+}
+.sb-head{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sb-logo{display:flex;align-items:center;gap:10px;}
+.sb-mark{width:38px;height:38px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--blue-dark);}
+.sb-text .t{font-family:var(--font-d);font-size:0.82rem;font-weight:700;color:var(--white);}
+.sb-text .s{font-size:0.65rem;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;}
+.sb-nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:3px;}
+.nav-lbl{font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.3);padding:10px 8px 5px;font-weight:600;}
+.nav-i{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;color:rgba(255,255,255,.65);font-size:0.83rem;font-weight:600;cursor:pointer;transition:all var(--tr);}
+.nav-i:hover{background:rgba(255,255,255,.08);color:var(--white);}
+.nav-i.active{background:var(--gold);color:var(--blue-dark);}
+.nav-i svg{width:16px;height:16px;flex-shrink:0;}
+.sb-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);}
+.sb-admin{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.sb-av{width:33px;height:33px;border-radius:50%;background:var(--blue-mid);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:700;font-size:0.78rem;}
+.sb-an{font-size:0.78rem;font-weight:700;color:var(--white);}
+.sb-role{font-size:0.64rem;color:var(--gold);text-transform:uppercase;letter-spacing:.4px;}
+.sb-logout{width:100%;padding:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:7px;color:rgba(255,255,255,.65);font-family:var(--font-b);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all var(--tr);}
+.sb-logout:hover{background:rgba(211,47,47,.2);border-color:rgba(211,47,47,.4);color:#FF8A80;}
+
+/* Admin main */
+.ad-main{flex:1;display:flex;flex-direction:column;background:var(--gray-100);}
+.ad-topbar{
+  background:var(--white);padding:14px 24px;display:flex;align-items:center;gap:12px;
+  border-bottom:2px solid var(--gray-200);position:sticky;top:47px;z-index:50;
+  box-shadow:0 2px 8px rgba(10,36,99,.06);flex-wrap:wrap;
+}
+.ad-tb-title{font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:var(--blue-dark);flex:1;}
+.filter-sel{
+  padding:7px 11px;border:1.5px solid var(--gray-200);border-radius:var(--rs);
+  font-family:var(--font-b);font-size:0.8rem;color:var(--gray-700);background:var(--gray-100);
+  cursor:pointer;outline:none;appearance:none;
+}
+.btn-pdf{
+  padding:7px 14px;background:var(--gold);color:var(--blue-dark);border:none;
+  border-radius:var(--rs);font-family:var(--font-b);font-size:0.8rem;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;gap:5px;
+}
+.btn-pdf:hover{background:var(--gold-dark);}
+.ad-body{padding:22px 24px;flex:1;}
+
+/* Stat cards */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.s-card{background:var(--white);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);border-top:4px solid var(--blue-dark);}
+.s-card.g{border-top-color:var(--gold);}
+.s-card.gr{border-top-color:var(--green);}
+.s-card.lb{border-top-color:var(--blue-light);}
+.s-lbl{font-size:0.68rem;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);font-weight:600;margin-bottom:5px;}
+.s-val{font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--blue-dark);line-height:1;margin-bottom:3px;}
+.s-sub{font-size:0.72rem;color:var(--gray-400);}
+
+/* Charts */
+.charts-r{display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:22px;}
+.c-card{background:var(--white);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);}
+.c-title{font-family:var(--font-d);font-size:0.95rem;font-weight:700;color:var(--blue-dark);margin-bottom:3px;}
+.c-sub{font-size:0.72rem;color:var(--gray-400);margin-bottom:14px;}
+.chart-wrap{position:relative;height:200px;}
+
+/* Bottom row */
+.bot-row{display:grid;grid-template-columns:3fr 2fr;gap:16px;}
+.tbl-card{background:var(--white);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;}
+.tbl-head{padding:14px 18px;border-bottom:1.5px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;}
+.tbl-title{font-family:var(--font-d);font-size:0.95rem;font-weight:700;color:var(--blue-dark);}
+.tbl-note{font-size:0.7rem;color:var(--gray-400);}
+table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+th{background:var(--gray-100);padding:9px 13px;text-align:left;font-size:0.65rem;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-400);font-weight:700;border-bottom:1.5px solid var(--gray-200);}
+td{padding:10px 13px;border-bottom:1px solid var(--gray-200);color:var(--gray-700);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--blue-pale);}
+.badge-ok{display:inline-block;padding:2px 8px;background:#E8F5E9;color:var(--green);border-radius:20px;font-size:0.68rem;font-weight:700;}
+.badge-blk{display:inline-block;padding:2px 8px;background:#FDECEA;color:var(--red);border-radius:20px;font-size:0.68rem;font-weight:700;}
+
+/* User mgmt panel */
+.umgmt-card{background:var(--white);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;}
+.umgmt-head{padding:14px 18px;border-bottom:1.5px solid var(--gray-200);}
+.umgmt-title{font-family:var(--font-d);font-size:0.95rem;font-weight:700;color:var(--blue-dark);margin-bottom:10px;}
+.srch-wrap{position:relative;}
+.srch-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--gray-400);}
+.srch-input{width:100%;padding:9px 12px 9px 32px;border:1.5px solid var(--gray-200);border-radius:var(--rs);font-family:var(--font-b);font-size:0.83rem;color:var(--gray-700);background:var(--gray-100);outline:none;}
+.srch-input:focus{border-color:var(--blue-mid);}
+.u-results{padding:10px 18px;display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;}
+.u-card{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:var(--rs);}
+.u-info strong{font-size:0.84rem;color:var(--blue-dark);display:block;}
+.u-info span{font-size:0.73rem;color:var(--gray-400);display:block;}
+.u-tag{display:inline-block;padding:2px 7px;background:var(--blue-pale);color:var(--blue-mid);border-radius:4px;font-size:0.67rem;font-weight:600;margin-top:3px;}
+.u-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.block-btn{padding:5px 12px;border:none;border-radius:6px;font-family:var(--font-b);font-size:0.73rem;font-weight:700;cursor:pointer;}
+.block-btn.b{background:#FDECEA;color:var(--red);border:1px solid #FFCDD2;}
+.block-btn.b:hover{background:var(--red);color:var(--white);}
+.block-btn.ub{background:#E8F5E9;color:var(--green);border:1px solid #C8E6C9;}
+.block-btn.ub:hover{background:var(--green);color:var(--white);}
+
+/* ── Responsive tweaks ───────────────────────────────────── */
+@media(max-width:900px){
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .charts-r,.bot-row{grid-template-columns:1fr;}
+}
+@media(max-width:700px){
+  .left-panel{width:100%;}
+  .right-panel{display:none;}
+  .s-admin .sidebar{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Screen Switcher ──────────────────────────────────────── -->
+<nav class="preview-bar">
+  <span class="preview-bar-title">📚 NEU Library Preview</span>
+  <button class="tab-btn active" onclick="show('login',this)">① Login</button>
+  <button class="tab-btn" onclick="show('register',this)">② Register</button>
+  <button class="tab-btn" onclick="show('checkin',this)">③ Check-In</button>
+  <button class="tab-btn" onclick="show('welcome',this)">④ Welcome</button>
+  <button class="tab-btn" onclick="show('admin',this)">⑤ Admin</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     SCREEN 1: LOGIN
+══════════════════════════════════════════ -->
+<div id="sc-login" class="screen active">
+  <div class="s-login">
+    <div class="left-panel">
+      <div class="lp-inner">
+        <header class="neu-header">
+          <img src="assets/neu-logo.png" alt="NEU Logo" class="neu-logo-mark" style="width:52px;height:52px;border-radius:50%;object-fit:cover;" />
+          <div class="neu-title">
+            <div class="school">New Era University</div>
+            <div class="sys">Library Visitor System</div>
+          </div>
+        </header>
+        <h1 class="page-title">Welcome Back</h1>
+        <p class="page-sub">Sign in with your NEU institutional account to continue.</p>
+        <button class="btn btn-google" onclick="show('checkin', document.querySelectorAll('.tab-btn')[2])">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" alt="Google"/>
+          Sign in with Google (@neu.edu.ph)
+        </button>
+        <div class="divider">or use ID / Email</div>
+        <div class="fg"><label>School ID or Email</label>
+          <input type="text" placeholder="2021-XXXXX or juan@neu.edu.ph"/></div>
+        <div class="fg"><label>Password</label>
+          <input type="password" placeholder="Enter your password"/></div>
+        <button class="btn btn-primary" onclick="show('checkin', document.querySelectorAll('.tab-btn')[2])">Sign In</button>
+        <footer class="page-footer">
+          Don't have an account? <a onclick="show('register', document.querySelectorAll('.tab-btn')[1])">Register here</a><br/><br/>
+          <small>Only <strong>@neu.edu.ph</strong> accounts are accepted.</small>
+        </footer>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div class="right-tag">
+        <h2>NEU Library <span>Visitor Portal</span></h2>
+        <p>Empowering New Era University students and faculty with a seamless library access experience. Your knowledge journey starts here.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 2: REGISTER
+══════════════════════════════════════════ -->
+<div id="sc-register" class="screen">
+  <div class="s-reg">
+    <div class="left-panel">
+      <div class="lp-inner">
+        <header class="neu-header">
+          <img src="assets/neu-logo.png" alt="NEU Logo" class="neu-logo-mark" style="width:52px;height:52px;border-radius:50%;object-fit:cover;" />
+          <div class="neu-title">
+            <div class="school">New Era University</div>
+            <div class="sys">Library Visitor System</div>
+          </div>
+        </header>
+        <h1 class="page-title">Complete Profile</h1>
+        <p class="page-sub">Fill in your details to finish setting up your library account.</p>
+        <div class="fg"><label>School / Employee ID *</label>
+          <input type="text" placeholder="e.g. 2021-12345"/></div>
+        <div class="fg">
+          <label>Full Name *</label>
+          <div class="form-row-3">
+            <input type="text" placeholder="First Name"/>
+            <input type="text" placeholder="M.I." maxlength="3"/>
+            <input type="text" placeholder="Last Name"/>
+          </div>
+        </div>
+        <div class="fg"><label>Institutional Email</label>
+          <input type="email" value="juan.delacruz@neu.edu.ph" readonly style="background:#f0f4ff;color:#666;cursor:default"/></div>
+        <div class="fg"><label>College / Department *</label>
+          <select>
+            <option>College of Computer Studies (CCS)</option>
+            <option>College of Nursing (CN)</option>
+            <option>College of Engineering (CE)</option>
+            <option>College of Business and Accountancy (CBA)</option>
+          </select></div>
+        <div class="fg"><label>Program / Course *</label>
+          <select>
+            <option>Bachelor of Science in Computer Science</option>
+            <option>Bachelor of Science in Information Technology</option>
+          </select></div>
+        <button class="btn btn-primary" onclick="show('checkin', document.querySelectorAll('.tab-btn')[2])">Complete Registration</button>
+        <footer class="page-footer">
+          Already registered? <a onclick="show('login', document.querySelectorAll('.tab-btn')[0])">Sign in here</a>
+        </footer>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div class="right-tag">
+        <h2>Join the <span>NEU Library</span></h2>
+        <p>Register once and enjoy seamless access to New Era University Library resources. Your profile stays saved for future visits.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3: CHECK-IN
+══════════════════════════════════════════ -->
+<div id="sc-checkin" class="screen">
+  <div class="s-checkin">
+    <div class="left-panel">
+      <div class="lp-inner">
+        <header class="neu-header">
+          <img src="assets/neu-logo.png" alt="NEU Logo" class="neu-logo-mark" style="width:52px;height:52px;border-radius:50%;object-fit:cover;" />
+          <div class="neu-title">
+            <div class="school">New Era University</div>
+            <div class="sys">Library Visitor System</div>
+          </div>
+        </header>
+        <div class="user-bar">
+          <div class="u-avatar">J</div>
+          <div style="flex:1">
+            <div class="u-name">Juan M. Dela Cruz</div>
+            <div class="u-sub">College of Computer Studies (CCS)</div>
+            <div class="u-sub" style="opacity:.65;font-size:.72rem;">ID: 2021-12345</div>
+          </div>
+          <button class="btn-sm-out" onclick="show('login', document.querySelectorAll('.tab-btn')[0])">Sign Out</button>
+        </div>
+        <div class="steps">
+          <div class="s-dot done"></div>
+          <div class="s-dot active"></div>
+          <div class="s-dot"></div>
+        </div>
+        <h1 class="page-title">Library Check-In</h1>
+        <p class="page-sub">Select your purpose and confirm your college to log your visit.</p>
+        <div class="fg">
+          <label>Purpose of Visit *</label>
+          <div class="purpose-grid">
+            <input type="radio" name="pr" id="pr1" class="p-radio" checked/>
+            <label for="pr1" class="p-label"><span class="p-icon">📖</span>Reading / Browsing</label>
+            <input type="radio" name="pr" id="pr2" class="p-radio"/>
+            <label for="pr2" class="p-label"><span class="p-icon">🔬</span>Research / Thesis</label>
+            <input type="radio" name="pr" id="pr3" class="p-radio"/>
+            <label for="pr3" class="p-label"><span class="p-icon">💻</span>Use of Computer</label>
+            <input type="radio" name="pr" id="pr4" class="p-radio"/>
+            <label for="pr4" class="p-label"><span class="p-icon">✏️</span>Assignments</label>
+            <input type="radio" name="pr" id="pr5" class="p-radio"/>
+            <label for="pr5" class="p-label"><span class="p-icon">📚</span>Borrow / Return</label>
+            <input type="radio" name="pr" id="pr6" class="p-radio"/>
+            <label for="pr6" class="p-label"><span class="p-icon">👥</span>Group Study</label>
+          </div>
+        </div>
+        <div class="fg"><label>College / Department *</label>
+          <select><option>College of Computer Studies (CCS)</option><option>College of Nursing (CN)</option></select></div>
+        <button class="btn btn-gold" onclick="show('welcome', document.querySelectorAll('.tab-btn')[3])">✔ Check In Now</button>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div class="right-tag">
+        <h2>Ready to <span>Learn?</span></h2>
+        <p>Log your visit to help the library track usage and ensure resources are always available for every NEU student and faculty member.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 4: WELCOME
+══════════════════════════════════════════ -->
+<div id="sc-welcome" class="screen">
+  <div class="s-welcome">
+    <div class="confetti-bg" id="conf-bg"></div>
+    <div class="w-card">
+      <div class="w-stamp">New Era University Library</div>
+      <div class="w-icon">
+        <div class="pulse"></div>
+        <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 26.5L22 33.5L37 18.5" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="w-title">Welcome to the<br/>NEU Library!</h1>
+      <p class="w-sub">✅ Check-in Successful</p>
+      <div class="info-grid">
+        <div class="chip"><div class="lbl">Visitor Name</div><div class="val">Juan M. Dela Cruz</div></div>
+        <div class="chip"><div class="lbl">School ID</div><div class="val">2021-12345</div></div>
+        <div class="chip full"><div class="lbl">College / Department</div><div class="val">College of Computer Studies (CCS)</div></div>
+        <div class="chip full"><div class="lbl">Purpose of Visit</div><div class="val">Reading / Browsing Books</div></div>
+      </div>
+      <p class="w-time" id="wtime"></p>
+      <button class="btn btn-primary" style="max-width:240px;margin:0 auto;" onclick="show('login', document.querySelectorAll('.tab-btn')[0])">← Back to Home</button>
+      <p class="cd-text">Returning to login in <span id="wcd">15</span> seconds…</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 5: ADMIN DASHBOARD
+══════════════════════════════════════════ -->
+<div id="sc-admin" class="screen">
+  <div class="s-admin">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sb-head">
+        <div class="sb-logo">
+          <img src="assets/neu-logo.png" alt="NEU Logo" class="sb-mark" style="width:38px;height:38px;border-radius:9px;object-fit:cover;" />
+          <div class="sb-text">
+            <div class="t">NEU Library</div>
+            <div class="s">Admin Panel</div>
+          </div>
+        </div>
+      </div>
+      <nav class="sb-nav">
+        <div class="nav-lbl">Overview</div>
+        <div class="nav-i active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>Dashboard
+        </div>
+        <div class="nav-lbl">Analytics</div>
+        <div class="nav-i">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+            <rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/>
+          </svg>Visit Log
+        </div>
+        <div class="nav-i">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20V12l7-7"/>
+          </svg>By College
+        </div>
+        <div class="nav-lbl">Management</div>
+        <div class="nav-i">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>Users
+        </div>
+      </nav>
+      <div class="sb-footer">
+        <div class="sb-admin">
+          <div class="sb-av">LA</div>
+          <div><div class="sb-an">Library Admin</div><div class="sb-role">Administrator</div></div>
+        </div>
+        <button class="sb-logout" onclick="show('login', document.querySelectorAll('.tab-btn')[0])">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="ad-main">
+      <div class="ad-topbar">
+        <div class="ad-tb-title">📊 Visitor Statistics Dashboard</div>
+        <select class="filter-sel"><option>This Month</option><option>Today</option><option>This Week</option><option>Custom Range</option></select>
+        <button class="btn-pdf">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>Export PDF
+        </button>
+      </div>
+      <div class="ad-body">
+
+        <!-- Stat cards -->
+        <div class="stat-row">
+          <div class="s-card"><div class="s-lbl">Total Visits (Period)</div><div class="s-val">1,248</div><div class="s-sub">Logged library entries</div></div>
+          <div class="s-card g"><div class="s-lbl">Colleges Represented</div><div class="s-val">9</div><div class="s-sub">Unique colleges/offices</div></div>
+          <div class="s-card gr"><div class="s-lbl">Visits Today</div><div class="s-val">47</div><div class="s-sub">Current day entries</div></div>
+          <div class="s-card lb"><div class="s-lbl">Top Purpose</div><div class="s-val" style="font-size:0.95rem;padding-top:6px;">Research / Thesis Work</div><div class="s-sub">Most common visit reason</div></div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-r">
+          <div class="c-card">
+            <div class="c-title">Daily Visitor Count</div>
+            <div class="c-sub">Number of visits per day this month</div>
+            <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+          </div>
+          <div class="c-card">
+            <div class="c-title">By College</div>
+            <div class="c-sub">Visitor breakdown per college</div>
+            <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Bottom row -->
+        <div class="bot-row">
+          <!-- Visit log table -->
+          <div class="tbl-card">
+            <div class="tbl-head">
+              <div class="tbl-title">Recent Visit Log</div>
+              <div class="tbl-note">Showing 5 of 1,248</div>
+            </div>
+            <table>
+              <thead><tr><th>Name</th><th>ID</th><th>College</th><th>Purpose</th><th>Time</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Juan Dela Cruz</td><td>2021-001</td><td>CCS</td><td>Research</td><td>8:32 AM</td><td><span class="badge-ok">Logged</span></td></tr>
+                <tr><td>Maria Santos</td><td>2022-045</td><td>CN</td><td>Reading</td><td>8:45 AM</td><td><span class="badge-ok">Logged</span></td></tr>
+                <tr><td>Pedro Reyes</td><td>2020-112</td><td>CE</td><td>Assignments</td><td>9:01 AM</td><td><span class="badge-ok">Logged</span></td></tr>
+                <tr><td>Ana Garcia</td><td>2023-078</td><td>CBA</td><td>Group Study</td><td>9:14 AM</td><td><span class="badge-ok">Logged</span></td></tr>
+                <tr><td>Carlo Mendoza</td><td>2021-203</td><td>CAS</td><td>Borrowing</td><td>9:22 AM</td><td><span class="badge-ok">Logged</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- User management -->
+          <div class="umgmt-card">
+            <div class="umgmt-head">
+              <div class="umgmt-title">User Management</div>
+              <div class="srch-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input class="srch-input" type="text" placeholder="Search by name, email, ID…" id="um-search"/>
+              </div>
+            </div>
+            <div class="u-results" id="um-results">
+              <div class="u-card">
+                <div class="u-info">
+                  <strong>Juan Dela Cruz</strong>
+                  <span>juan.delacruz@neu.edu.ph</span>
+                  <span class="u-tag">CCS</span>
+                </div>
+                <div class="u-actions">
+                  <span class="badge-ok">Active</span>
+                  <button class="block-btn b" onclick="toggleBlock(this)">Block</button>
+                </div>
+              </div>
+              <div class="u-card">
+                <div class="u-info">
+                  <strong>Maria Santos</strong>
+                  <span>maria.santos@neu.edu.ph</span>
+                  <span class="u-tag">CN</span>
+                </div>
+                <div class="u-actions">
+                  <span class="badge-blk">Blocked</span>
+                  <button class="block-btn ub" onclick="toggleBlock(this)">Unblock</button>
+                </div>
+              </div>
+              <div class="u-card">
+                <div class="u-info">
+                  <strong>Pedro Reyes</strong>
+                  <span>pedro.reyes@neu.edu.ph</span>
+                  <span class="u-tag">CE</span>
+                </div>
+                <div class="u-actions">
+                  <span class="badge-ok">Active</span>
+                  <button class="block-btn b" onclick="toggleBlock(this)">Block</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /bot-row -->
+      </div><!-- /ad-body -->
+    </div><!-- /ad-main -->
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+// ── Screen switcher ──────────────────────────────────────────
+function show(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sc-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'admin') renderCharts();
+  if (name === 'welcome') startWelcomeTimer();
+}
+
+// ── Welcome timer ────────────────────────────────────────────
+let wTimer;
+function startWelcomeTimer() {
+  const now = new Date();
+  document.getElementById('wtime').textContent = now.toLocaleString('en-PH', {
+    weekday:'long', year:'numeric', month:'long', day:'numeric',
+    hour:'2-digit', minute:'2-digit'
+  });
+  clearInterval(wTimer);
+  let s = 15;
+  document.getElementById('wcd').textContent = s;
+  wTimer = setInterval(() => {
+    s--;
+    const el = document.getElementById('wcd');
+    if (el) el.textContent = s;
+    if (s <= 0) clearInterval(wTimer);
+  }, 1000);
+  // Confetti
+  const bg = document.getElementById('conf-bg');
+  bg.innerHTML = '';
+  const colors = ['#F9C61F','#0A2463','#1A4B9B','#27AE60','#fff'];
+  for (let i = 0; i < 35; i++) {
+    const d = document.createElement('div');
+    d.style.cssText = `
+      position:absolute;bottom:-20px;
+      left:${Math.random()*100}vw;
+      width:${6+Math.random()*9}px;height:${6+Math.random()*9}px;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      opacity:0;
+      animation:float-up ${2+Math.random()*3}s ease-in ${Math.random()*4}s infinite;
+    `;
+    bg.appendChild(d);
+  }
+}
+
+// Add confetti keyframe
+const style = document.createElement('style');
+style.textContent = `@keyframes float-up{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(-200px) rotate(360deg);}}`;
+document.head.appendChild(style);
+
+// ── Block/Unblock toggle (demo) ───────────────────────────────
+function toggleBlock(btn) {
+  const card = btn.closest('.u-card');
+  const badgeEl = card.querySelector('span[class^="badge-"]');
+  const isBlocked = btn.classList.contains('ub');
+  if (isBlocked) {
+    badgeEl.className = 'badge-ok'; badgeEl.textContent = 'Active';
+    btn.className = 'block-btn b'; btn.textContent = 'Block';
+  } else {
+    badgeEl.className = 'badge-blk'; badgeEl.textContent = 'Blocked';
+    btn.className = 'block-btn ub'; btn.textContent = 'Unblock';
+  }
+}
+
+// ── Charts ────────────────────────────────────────────────────
+let barChart, donutChart;
+function renderCharts() {
+  if (barChart) return; // only render once
+
+  // Bar chart – daily visitors
+  const days = ['Mar 1','Mar 3','Mar 5','Mar 7','Mar 9','Mar 11','Mar 13','Mar 15'];
+  const vals = [42, 67, 55, 88, 73, 91, 78, 47];
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  barChart = new Chart(barCtx, {
+    type:'bar',
+    data:{
+      labels: days,
+      datasets:[{
+        label:'Visitors', data: vals,
+        backgroundColor:'#0A2463', borderColor:'#F9C61F',
+        borderWidth:2, borderRadius:5,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{backgroundColor:'#0A2463',titleColor:'#F9C61F',bodyColor:'#fff'}},
+      scales:{
+        y:{beginAtZero:true, ticks:{color:'#666',stepSize:20}, grid:{color:'#eee'}},
+        x:{ticks:{color:'#666'}, grid:{display:false}},
+      }
+    }
+  });
+
+  // Doughnut chart – by college
+  const donutCtx = document.getElementById('donutChart').getContext('2d');
+  donutChart = new Chart(donutCtx, {
+    type:'doughnut',
+    data:{
+      labels:['CCS','CN','CE','CBA','CAS','CED','CCJE'],
+      datasets:[{
+        data:[320, 215, 180, 155, 98, 72, 48],
+        backgroundColor:['#0A2463','#1565C0','#1976D2','#F9C61F','#FDD835','#42A5F5','#0D47A1'],
+        borderWidth:2, borderColor:'#fff',
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'65%',
+      plugins:{
+        legend:{position:'right', labels:{font:{size:10}, color:'#444', boxWidth:12}},
+        tooltip:{backgroundColor:'#0A2463', titleColor:'#F9C61F', bodyColor:'#fff'},
+      }
+    }
+  });
+}
+
+// User search filter (demo)
+document.getElementById('um-search').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#um-results .u-card').forEach(card => {
+    const name = card.querySelector('strong').textContent.toLowerCase();
+    const email = card.querySelector('span').textContent.toLowerCase();
+    card.style.display = (name.includes(q) || email.includes(q)) ? '' : 'none';
+  });
+});
+</script>
+</body>
+</html>

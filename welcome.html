@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEU Library – Welcome!</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="icon" href="assets/neu-logo.png" />
+  <style>
+    /* Confetti-style floating dots for celebration effect */
+    @keyframes float-up {
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(-180px) rotate(360deg); }
+    }
+
+    .confetti-wrap {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .confetti-dot {
+      position: absolute;
+      bottom: -20px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      opacity: 0;
+      animation: float-up 3s ease-in infinite;
+    }
+
+    .welcome-page { position: relative; }
+    .welcome-card { position: relative; z-index: 1; }
+
+    .neu-stamp {
+      display: inline-block;
+      background: var(--blue-dark);
+      color: var(--gold);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .pulse-ring {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 3px solid rgba(27,139,62,0.3);
+      animation: pulse-out 2s ease-out infinite;
+    }
+
+    @keyframes pulse-out {
+      0%   { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    .welcome-icon { position: relative; }
+  </style>
+</head>
+<body>
+
+<!-- Confetti background -->
+<div class="confetti-wrap" id="confetti-wrap" aria-hidden="true"></div>
+
+<!-- Welcome card -->
+<main class="welcome-page">
+  <div class="welcome-card">
+
+    <div class="neu-stamp">New Era University Library</div>
+
+    <!-- Success icon -->
+    <div class="welcome-icon">
+      <div class="pulse-ring"></div>
+      <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="26" cy="26" r="26" fill="white" fill-opacity="0.2"/>
+        <path d="M15 26.5L22 33.5L37 18.5" stroke="white" stroke-width="3.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Welcome message -->
+    <h1 class="welcome-title">Welcome to the<br/>NEU Library!</h1>
+    <p class="welcome-subtitle">✅ Check-in Successful</p>
+
+    <!-- Visitor info chips -->
+    <div class="visitor-info-grid">
+      <div class="info-chip">
+        <div class="label">Visitor Name</div>
+        <div class="value" id="visitor-name">—</div>
+      </div>
+      <div class="info-chip">
+        <div class="label">School ID</div>
+        <div class="value" id="visitor-id">—</div>
+      </div>
+      <div class="info-chip full">
+        <div class="label">College / Department</div>
+        <div class="value" id="visitor-college">—</div>
+      </div>
+      <div class="info-chip full">
+        <div class="label">Purpose of Visit</div>
+        <div class="value" id="visitor-purpose">—</div>
+      </div>
+    </div>
+
+    <!-- Time -->
+    <p class="visit-time-line" id="visit-time"></p>
+
+    <!-- Return button -->
+    <button class="btn btn-primary" id="return-btn" style="max-width:260px; margin: 0 auto;">
+      ← Back to Home
+    </button>
+
+    <p class="countdown-text">
+      Returning to login in <span id="countdown">15</span> seconds…
+    </p>
+
+  </div>
+</main>
+
+<script type="module" src="js/welcome.js"></script>
+
+<script>
+  // Generate confetti dots
+  const wrap = document.getElementById('confetti-wrap');
+  const colors = ['#F9C61F', '#0A2463', '#1A4B9B', '#27AE60', '#ffffff', '#FFD700'];
+  for (let i = 0; i < 40; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'confetti-dot';
+    dot.style.left = Math.random() * 100 + 'vw';
+    dot.style.width  = (6 + Math.random() * 10) + 'px';
+    dot.style.height = (6 + Math.random() * 10) + 'px';
+    dot.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+    dot.style.animationDelay = (Math.random() * 4) + 's';
+    dot.style.animationDuration = (2 + Math.random() * 3) + 's';
+    wrap.appendChild(dot);
+  }
+</script>
+
+</body>
+</html>

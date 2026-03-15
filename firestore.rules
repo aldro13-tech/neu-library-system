@@ -1,0 +1,81 @@
+// ============================================================
+// firestore.rules
+// Firestore Security Rules for NEU Library Visitor System
+// Deploy with: firebase deploy --only firestore:rules
+// ============================================================
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isNEUEmail() {
+      return request.auth.token.email.matches('.*@neu\\.edu\\.ph$');
+    }
+
+    function isAdmin() {
+      return isAuthenticated()
+        && isNEUEmail()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    function isNotBlocked() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isBlocked == false;
+    }
+
+    // ── Users collection ────────────────────────────────────
+    match /users/{userId} {
+      // Anyone authenticated with NEU email can read their own document
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+
+      // User can create their own document on first sign-in
+      allow create: if isAuthenticated()
+        && isNEUEmail()
+        && isOwner(userId)
+        && request.resource.data.role == 'visitor'; // Cannot self-assign admin
+
+      // User can update own non-sensitive fields; admin can update any
+      allow update: if isAuthenticated() && (
+        (isOwner(userId) && isNEUEmail() && isNotBlocked()
+          && !('role' in request.resource.data.diff(resource.data).affectedKeys())
+          && !('isBlocked' in request.resource.data.diff(resource.data).affectedKeys())
+        )
+        || isAdmin()
+      );
+
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // ── Visits collection ────────────────────────────────────
+    match /visits/{visitId} {
+      // Admins can read all visits; visitors can only read their own
+      allow read: if isAuthenticated() && (
+        isAdmin()
+        || (isOwner(resource.data.uid) && isNEUEmail())
+      );
+
+      // Visitors can create their own visit log (not blocked)
+      allow create: if isAuthenticated()
+        && isNEUEmail()
+        && isNotBlocked()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasAll(['uid', 'email', 'college', 'purpose', 'checkInTime', 'date']);
+
+      // No one can update or delete visit logs (immutable audit trail)
+      // Admin may delete if truly necessary via Firebase console
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+  }
+}

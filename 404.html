@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEU Library – Page Not Found</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .not-found-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--blue-dark);
+      padding: 24px;
+    }
+    .not-found-card {
+      background: white;
+      border-radius: 16px;
+      padding: 52px 48px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .nf-code {
+      font-family: var(--font-display);
+      font-size: 6rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      line-height: 1;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nf-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--blue-dark);
+      margin-bottom: 12px;
+    }
+    .nf-sub {
+      font-size: 0.9rem;
+      color: var(--gray-400);
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .nf-stripe {
+      height: 5px;
+      background: linear-gradient(90deg, var(--blue-dark), var(--gold));
+      border-radius: 4px;
+      margin-bottom: 32px;
+    }
+    .countdown-small {
+      font-size: 0.8rem;
+      color: var(--gray-400);
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+<main class="not-found-page">
+  <div class="not-found-card">
+    <div class="nf-stripe"></div>
+
+    <div class="nf-code">404</div>
+    <h1 class="nf-title">Page Not Found</h1>
+    <p class="nf-sub">
+      The page you're looking for doesn't exist or has been moved.<br/>
+      You'll be redirected to the NEU Library login page shortly.
+    </p>
+
+    <button class="btn btn-primary" onclick="window.location.href='index.html'"
+      style="max-width:260px; margin: 0 auto;">
+      Go to Login
+    </button>
+    <p class="countdown-small">
+      Redirecting in <strong id="cd">5</strong> seconds…
+    </p>
+  </div>
+</main>
+
+<script>
+  let s = 5;
+  const el = document.getElementById('cd');
+  const t = setInterval(() => {
+    s--;
+    if (el) el.textContent = s;
+    if (s <= 0) { clearInterval(t); window.location.href = 'index.html'; }
+  }, 1000);
+</script>
+</body>
+</html>
