@@ -11,7 +11,7 @@ import {
   onAuthStateChanged,
   doc,
   getDoc,
-  updateDoc,
+  setDoc,
   serverTimestamp,
   ADMIN_EMAILS,
 } from "./firebase-config.js";
@@ -77,11 +77,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const displayName = [firstName, mi ? mi + "." : "", lastName]
           .filter(Boolean).join(" ");
 
-        await updateDoc(doc(db, "users", user.uid), {
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
           schoolId, firstName, mi: mi || "", lastName,
           displayName, college, program,
+          photoURL: user.photoURL || "",
           isProfileComplete: true,
-          updatedAt: serverTimestamp(),
+          isBlocked: false,
+          createdAt: serverTimestamp(),
           role: ADMIN_EMAILS.includes(user.email) ? "admin" : "visitor",
         });
 
