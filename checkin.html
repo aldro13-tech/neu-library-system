@@ -7,30 +7,13 @@
   <link rel="stylesheet" href="css/main.css" />
   <link rel="icon" href="assets/neu-logo.png" />
   <style>
-    .checkin-steps {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 24px;
-    }
-    .step-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--gray-200);
-    }
-    .step-dot.active { background: var(--blue-dark); }
-    .step-dot.done { background: var(--gold); }
-
     .purpose-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-bottom: 18px;
     }
-
-    .purpose-option {
-      display: none;
-    }
-
+    .purpose-option { display: none; }
     .purpose-label {
       display: flex;
       flex-direction: column;
@@ -48,20 +31,17 @@
       color: var(--gray-700);
       background: var(--gray-100);
     }
-
     .purpose-label:hover {
       border-color: var(--blue-mid);
       background: var(--blue-pale);
       color: var(--blue-dark);
     }
-
     .purpose-option:checked + .purpose-label {
       border-color: var(--blue-dark);
       background: var(--blue-dark);
       color: var(--white);
       box-shadow: 0 4px 12px rgba(10,36,99,0.22);
     }
-
     .purpose-icon { font-size: 1.5rem; line-height: 1; }
   </style>
 </head>
@@ -69,11 +49,9 @@
 
 <div class="page-wrapper">
 
-  <!-- ── Left Panel: Check-in Form ──────────────────────── -->
   <aside class="left-panel">
     <div class="left-panel-inner">
 
-      <!-- Header / Logo -->
       <header class="neu-header">
         <img src="assets/neu-logo.png" alt="NEU Logo" class="neu-logo-mark" />
         <div class="neu-title">
@@ -84,37 +62,23 @@
 
       <!-- User info bar -->
       <div class="user-info-bar">
-        <img
-          src="assets/default-avatar.png"
-          alt="User Avatar"
-          class="user-avatar"
-          id="user-avatar"
-          onerror="this.style.display='none'"
-        />
+        <img src="assets/default-avatar.png" alt="User Avatar"
+          class="user-avatar" id="user-avatar"
+          onerror="this.style.display='none'" />
         <div class="user-details">
           <div class="user-name" id="user-name">Loading…</div>
-          <div class="user-sub" id="user-college">—</div>
           <div class="user-sub" id="user-id" style="opacity:0.65; font-size:0.75rem;"></div>
         </div>
         <button class="btn-logout-sm" id="logout-btn" type="button">Sign Out</button>
       </div>
 
-      <!-- Step indicator -->
-      <div class="checkin-steps">
-        <div class="step-dot done"></div>
-        <div class="step-dot active"></div>
-        <div class="step-dot"></div>
-      </div>
-
       <h1 class="page-title">Library Check-In</h1>
-      <p class="page-subtitle">Select your purpose and confirm your college to log your visit.</p>
+      <p class="page-subtitle">Select your purpose to log your visit.</p>
 
-      <!-- Error message -->
       <div class="error-msg" id="error-msg" role="alert"></div>
 
       <form id="checkin-form" novalidate>
 
-        <!-- Purpose of Visit (icon grid) -->
         <div class="form-group">
           <label>Purpose of Visit <span class="req">*</span></label>
           <div class="purpose-grid">
@@ -163,16 +127,8 @@
 
           </div>
 
-          <!-- Hidden select that mirrors the radio selection for JS -->
+          <!-- Hidden select mirrors the radio selection -->
           <select id="purpose" name="purpose" style="display:none"></select>
-        </div>
-
-        <!-- College / Department (confirm) -->
-        <div class="form-group">
-          <label for="college-confirm">College / Department <span class="req">*</span></label>
-          <select id="college-confirm" name="college-confirm">
-            <option value="">Select College</option>
-          </select>
         </div>
 
         <button class="btn btn-gold" type="submit" id="submit-btn">
@@ -183,24 +139,17 @@
     </div>
   </aside>
 
-  <!-- ── Right Panel: Decorative ────────────────────────── -->
   <section class="right-panel" aria-hidden="true">
     <div class="right-tagline">
-      <h2>
-        Ready to
-        <span>Learn?</span>
-      </h2>
-      <p>
-        Log your visit to help the library track usage and ensure resources
-        are always available for every NEU student and faculty member.
-      </p>
+      <h2>Ready to <span>Learn?</span></h2>
+      <p>Log your visit to help the library track usage and ensure
+        resources are always available for every NEU student and faculty member.</p>
     </div>
   </section>
 
-</div><!-- /.page-wrapper -->
+</div>
 
 <script type="module">
-  // Sync radio buttons to hidden <select #purpose>
   document.querySelectorAll('input[name="purpose-radio"]').forEach((radio) => {
     radio.addEventListener('change', () => {
       document.getElementById('purpose').value = radio.value;
