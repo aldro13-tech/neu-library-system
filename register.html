@@ -3,9 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NEU Library – Register / Complete Profile</title>
+  <title>NEU Library – Register</title>
   <link rel="stylesheet" href="css/main.css" />
   <link rel="icon" href="assets/neu-logo.png" />
+  <style>
+    /* Step indicators */
+    .reg-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 28px;
+    }
+    .reg-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+    .reg-step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--gray-200);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700; color: var(--gray-400);
+      transition: all 0.3s ease;
+      position: relative; z-index: 1;
+    }
+    .reg-step-dot.active {
+      background: var(--blue-dark); color: var(--white);
+    }
+    .reg-step-dot.done {
+      background: var(--gold); color: var(--blue-dark);
+    }
+    .reg-step-label {
+      font-size: 0.65rem; color: var(--gray-400);
+      text-align: center; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .3px;
+    }
+    .reg-step-line {
+      flex: 1; height: 2px;
+      background: var(--gray-200);
+      margin-bottom: 14px;
+    }
+    .reg-step-line.done { background: var(--gold); }
+
+    /* Step panels */
+    .reg-panel { display: none; }
+    .reg-panel.active { display: block; }
+
+    /* Google authenticated bar */
+    .auth-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: #E8F5E9;
+      border: 1px solid #C8E6C9;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 18px;
+    }
+    .auth-bar-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .auth-bar-text { font-size: 0.83rem; color: #2E7D32; font-weight: 600; }
+    .auth-bar-email { font-size: 0.78rem; color: #555; }
+
+    /* Password strength */
+    .pw-strength {
+      height: 4px; border-radius: 2px;
+      background: var(--gray-200);
+      margin-top: 6px; overflow: hidden;
+    }
+    .pw-strength-bar {
+      height: 100%; width: 0%;
+      border-radius: 2px;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .pw-hint { font-size: 0.73rem; color: var(--gray-400); margin-top: 4px; }
+  </style>
 </head>
 <body>
 
@@ -22,58 +94,122 @@
         </div>
       </header>
 
-      <h1 class="page-title">Complete Profile</h1>
-      <p class="page-subtitle">Fill in your details to finish setting up your library account.</p>
+      <h1 class="page-title">Create Account</h1>
+      <p class="page-subtitle">Register your NEU library account in two steps.</p>
+
+      <!-- Step indicators -->
+      <div class="reg-steps">
+        <div class="reg-step">
+          <div class="reg-step-dot active" id="step-dot-1">1</div>
+          <div class="reg-step-label">Verify</div>
+        </div>
+        <div class="reg-step-line" id="step-line-1"></div>
+        <div class="reg-step">
+          <div class="reg-step-dot" id="step-dot-2">2</div>
+          <div class="reg-step-label">Profile</div>
+        </div>
+      </div>
 
       <div class="error-msg" id="error-msg" role="alert"></div>
 
-      <form id="register-form" novalidate>
+      <!-- ══ STEP 1: Google sign-in ══════════════════════════ -->
+      <div class="reg-panel active" id="step-1">
+        <p style="font-size:0.88rem;color:var(--gray-400);margin-bottom:20px;line-height:1.6;">
+          First, verify your NEU Google account. This confirms your identity
+          and pre-fills your email.
+        </p>
+
+        <button class="btn btn-google" id="google-reg-btn" type="button">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            width="18" height="18" alt="Google"/>
+          Continue with Google (@neu.edu.ph)
+        </button>
+
+        <div class="divider">then set a password below</div>
 
         <div class="form-group">
-          <label for="school-id">School / Employee ID <span class="req">*</span></label>
-          <input type="text" id="school-id" name="school-id"
-            placeholder="e.g. 2021-12345" autocomplete="off" />
+          <label for="reg-password">Set Password <span class="req">*</span></label>
+          <input type="password" id="reg-password"
+            placeholder="Min. 8 characters" autocomplete="new-password" />
+          <div class="pw-strength"><div class="pw-strength-bar" id="pw-bar"></div></div>
+          <div class="pw-hint" id="pw-hint">Password strength: —</div>
         </div>
 
         <div class="form-group">
-          <label>Full Name <span class="req">*</span></label>
-          <div class="form-row">
-            <input type="text" id="first-name" placeholder="First Name" autocomplete="given-name" />
-            <input type="text" id="mi" placeholder="M.I." maxlength="3"
-              class="mi-field" autocomplete="additional-name" />
-            <input type="text" id="last-name" placeholder="Last Name" autocomplete="family-name" />
+          <label for="reg-password-confirm">Confirm Password <span class="req">*</span></label>
+          <input type="password" id="reg-password-confirm"
+            placeholder="Re-enter your password" autocomplete="new-password" />
+        </div>
+
+        <button class="btn btn-primary" id="step1-next-btn" type="button" disabled>
+          Next: Complete Profile →
+        </button>
+
+        <footer class="page-footer" style="margin-top:20px;">
+          Already have an account?
+          <a href="index.html">Sign in here</a>
+        </footer>
+      </div>
+
+      <!-- ══ STEP 2: Profile form ════════════════════════════ -->
+      <div class="reg-panel" id="step-2">
+
+        <!-- Authenticated user bar -->
+        <div class="auth-bar" id="auth-bar">
+          <span class="auth-bar-icon">✅</span>
+          <div>
+            <div class="auth-bar-text">Google account verified</div>
+            <div class="auth-bar-email" id="auth-bar-email">—</div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="email">Institutional Email</label>
-          <input type="email" id="email" name="email" readonly
-            style="background:#f0f4ff;color:#666;cursor:default;" />
-        </div>
+        <form id="register-form" novalidate>
 
-        <div class="form-group">
-          <label for="college">College / Department <span class="req">*</span></label>
-          <select id="college" name="college">
-            <option value="">Select College / Department</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label for="school-id">School / Employee ID <span class="req">*</span></label>
+            <input type="text" id="school-id" placeholder="e.g. 2021-12345" autocomplete="off" />
+          </div>
 
-        <div class="form-group">
-          <label for="program">Program / Course <span class="req">*</span></label>
-          <select id="program" name="program" disabled>
-            <option value="">Select a college first</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label>Full Name <span class="req">*</span></label>
+            <div class="form-row">
+              <input type="text" id="first-name" placeholder="First Name" autocomplete="given-name" />
+              <input type="text" id="mi" placeholder="M.I." maxlength="3"
+                class="mi-field" autocomplete="additional-name" />
+              <input type="text" id="last-name" placeholder="Last Name" autocomplete="family-name" />
+            </div>
+          </div>
 
-        <button class="btn btn-primary" type="submit" id="submit-btn">
-          Complete Registration
-        </button>
-      </form>
+          <div class="form-group">
+            <label for="email">Institutional Email</label>
+            <input type="email" id="email" readonly
+              style="background:#f0f4ff;color:#666;cursor:default;" />
+          </div>
 
-      <footer class="page-footer">
-        Already have an account?
-        <a href="index.html" id="go-to-login">Sign in here</a>
-      </footer>
+          <div class="form-group">
+            <label for="college">College / Department <span class="req">*</span></label>
+            <select id="college">
+              <option value="">Select College / Department</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="program">Program / Course <span class="req">*</span></label>
+            <select id="program" disabled>
+              <option value="">Select a college first</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" type="submit" id="submit-btn">
+            Complete Registration
+          </button>
+        </form>
+
+        <footer class="page-footer" style="margin-top:20px;">
+          Already have an account?
+          <a href="index.html">Sign in here</a>
+        </footer>
+      </div>
 
     </div>
   </aside>
@@ -81,161 +217,83 @@
   <section class="right-panel" aria-hidden="true">
     <div class="right-tagline">
       <h2>Join the <span>NEU Library</span></h2>
-      <p>Register once and enjoy seamless access to the New Era University
-      Library resources. Your profile stays saved for future visits.</p>
+      <p>Register once and enjoy seamless access — sign in with Google
+        or with your email and password anytime.</p>
     </div>
   </section>
 
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     DROPDOWN SCRIPT — plain <script>, NO imports, NO Firebase
-     Runs immediately, works with file:// and http:// alike
-════════════════════════════════════════════════════════ -->
+<!-- ── Colleges dropdown (plain script, no Firebase) ───────── -->
 <script>
 const COLLEGES = {
-  "College of Accountancy": [
-    "Bachelor of Science in Accountancy"
-  ],
-  "College of Agriculture": [
-    "Bachelor of Science in Agriculture"
-  ],
-  "College of Arts and Sciences": [
-    "Bachelor of Arts in Economics",
-    "Bachelor of Arts in Political Science",
-    "Bachelor of Science in Biology",
-    "Bachelor of Science in Psychology",
-    "Bachelor of Public Administration"
-  ],
-  "College of Business Administration": [
-    "BS in Business Administration – Major in Financial Management",
-    "BS in Business Administration – Major in Human Resource Development Management",
-    "BS in Business Administration – Major in Legal Management",
-    "BS in Business Administration – Major in Marketing Management",
-    "Bachelor of Science in Entrepreneurship",
-    "Bachelor of Science in Real Estate Management"
-  ],
-  "College of Communication": [
-    "Bachelor of Arts in Broadcasting",
-    "Bachelor of Arts in Communication",
-    "Bachelor of Arts in Journalism"
-  ],
-  "College of Informatics and Computing Studies (CICS)": [
-    "Bachelor of Science in Information Technology",
-    "Bachelor of Science in Computer Science",
-    "Bachelor of Science in Information Systems",
-    "Bachelor of Library and Information Science",
-    "BS in Entertainment and Multimedia Computing – Digital Animation Technology",
-    "BS in Entertainment and Multimedia Computing – Game Development"
-  ],
-  "College of Criminology": [
-    "Bachelor of Science in Criminology"
-  ],
-  "College of Education": [
-    "Bachelor of Elementary Education – General",
-    "Bachelor of Elementary Education – Preschool Education",
-    "Bachelor of Elementary Education – Special Education",
-    "Bachelor of Secondary Education – English",
-    "Bachelor of Secondary Education – Filipino",
-    "Bachelor of Secondary Education – Mathematics",
-    "Bachelor of Secondary Education – Science",
-    "Bachelor of Secondary Education – Social Studies",
-    "Bachelor of Secondary Education – MAPEH",
-    "Bachelor of Secondary Education – Technology and Livelihood Education"
-  ],
-  "College of Engineering and Architecture": [
-    "Bachelor of Science in Architecture",
-    "Bachelor of Science in Astronomy",
-    "Bachelor of Science in Civil Engineering",
-    "Bachelor of Science in Electrical Engineering",
-    "Bachelor of Science in Electronics Engineering",
-    "Bachelor of Science in Industrial Engineering",
-    "Bachelor of Science in Mechanical Engineering"
-  ],
-  "College of Medical Technology": [
-    "Bachelor of Science in Medical Technology"
-  ],
-  "College of Midwifery": [
-    "Diploma in Midwifery"
-  ],
-  "College of Music": [
-    "Bachelor of Music – Choral Conducting",
-    "Bachelor of Music – Music Education",
-    "Bachelor of Music – Piano",
-    "Bachelor of Music – Voice"
-  ],
-  "College of Nursing": [
-    "Bachelor of Science in Nursing"
-  ],
-  "College of Physical Therapy": [
-    "Bachelor of Science in Physical Therapy"
-  ],
-  "College of Respiratory Therapy": [
-    "Bachelor of Science in Respiratory Therapy"
-  ],
-  "School of International Relations": [
-    "Bachelor of Arts in Foreign Service"
-  ],
-  "College of Law": [
-    "Juris Doctor (JD)"
-  ],
-  "College of Medicine": [
-    "Doctor of Medicine (MD)"
-  ],
-  "School of Graduate Studies": [
-    "Doctor of Philosophy (PhD) in Education",
-    "Doctor in Business Administration (DBA)",
-    "Master of Arts in Education (MAEd)",
-    "Master in Business Administration (MBA)"
-  ],
-  "Administrative / Faculty / Staff": [
-    "N/A – Faculty",
-    "N/A – Staff",
-    "N/A – Administration"
-  ]
+  "College of Accountancy":["Bachelor of Science in Accountancy"],
+  "College of Agriculture":["Bachelor of Science in Agriculture"],
+  "College of Arts and Sciences":["Bachelor of Arts in Economics","Bachelor of Arts in Political Science","Bachelor of Science in Biology","Bachelor of Science in Psychology","Bachelor of Public Administration"],
+  "College of Business Administration":["BS in Business Administration – Major in Financial Management","BS in Business Administration – Major in Human Resource Development Management","BS in Business Administration – Major in Legal Management","BS in Business Administration – Major in Marketing Management","Bachelor of Science in Entrepreneurship","Bachelor of Science in Real Estate Management"],
+  "College of Communication":["Bachelor of Arts in Broadcasting","Bachelor of Arts in Communication","Bachelor of Arts in Journalism"],
+  "College of Informatics and Computing Studies (CICS)":["Bachelor of Science in Information Technology","Bachelor of Science in Computer Science","Bachelor of Science in Information Systems","Bachelor of Library and Information Science","BS in Entertainment and Multimedia Computing – Digital Animation Technology","BS in Entertainment and Multimedia Computing – Game Development"],
+  "College of Criminology":["Bachelor of Science in Criminology"],
+  "College of Education":["Bachelor of Elementary Education – General","Bachelor of Elementary Education – Preschool Education","Bachelor of Elementary Education – Special Education","Bachelor of Secondary Education – English","Bachelor of Secondary Education – Filipino","Bachelor of Secondary Education – Mathematics","Bachelor of Secondary Education – Science","Bachelor of Secondary Education – Social Studies","Bachelor of Secondary Education – MAPEH","Bachelor of Secondary Education – Technology and Livelihood Education"],
+  "College of Engineering and Architecture":["Bachelor of Science in Architecture","Bachelor of Science in Astronomy","Bachelor of Science in Civil Engineering","Bachelor of Science in Electrical Engineering","Bachelor of Science in Electronics Engineering","Bachelor of Science in Industrial Engineering","Bachelor of Science in Mechanical Engineering"],
+  "College of Medical Technology":["Bachelor of Science in Medical Technology"],
+  "College of Midwifery":["Diploma in Midwifery"],
+  "College of Music":["Bachelor of Music – Choral Conducting","Bachelor of Music – Music Education","Bachelor of Music – Piano","Bachelor of Music – Voice"],
+  "College of Nursing":["Bachelor of Science in Nursing"],
+  "College of Physical Therapy":["Bachelor of Science in Physical Therapy"],
+  "College of Respiratory Therapy":["Bachelor of Science in Respiratory Therapy"],
+  "School of International Relations":["Bachelor of Arts in Foreign Service"],
+  "College of Law":["Juris Doctor (JD)"],
+  "College of Medicine":["Doctor of Medicine (MD)"],
+  "School of Graduate Studies":["Doctor of Philosophy (PhD) in Education","Doctor in Business Administration (DBA)","Master of Arts in Education (MAEd)","Master in Business Administration (MBA)"],
+  "Administrative / Faculty / Staff":["N/A – Faculty","N/A – Staff","N/A – Administration"]
 };
 
-// Expose to window so register.js can also read it
 window.COLLEGES = COLLEGES;
 
-// Populate college dropdown as soon as this script runs
-(function populateColleges() {
+(function(){
   var sel = document.getElementById('college');
   if (!sel) return;
   Object.keys(COLLEGES).forEach(function(col) {
     var opt = document.createElement('option');
-    opt.value = col;
-    opt.textContent = col;
+    opt.value = col; opt.textContent = col;
     sel.appendChild(opt);
   });
 })();
 
-// Wire up the cascade: college → program
 document.getElementById('college').addEventListener('change', function() {
-  var programSel = document.getElementById('program');
-  var chosen = this.value;
-
-  // Reset program dropdown
-  programSel.innerHTML = '<option value="">Select Program / Course</option>';
-
-  if (!chosen) {
-    programSel.disabled = true;
-    return;
-  }
-
-  var programs = COLLEGES[chosen] || [];
-  programs.forEach(function(prog) {
-    var opt = document.createElement('option');
-    opt.value = prog;
-    opt.textContent = prog;
-    programSel.appendChild(opt);
+  var pSel = document.getElementById('program');
+  pSel.innerHTML = '<option value="">Select Program / Course</option>';
+  if (!this.value) { pSel.disabled = true; return; }
+  (COLLEGES[this.value]||[]).forEach(function(p) {
+    var o = document.createElement('option'); o.value=p; o.textContent=p; pSel.appendChild(o);
   });
+  pSel.disabled = false;
+});
 
-  programSel.disabled = false;
+// Password strength meter
+document.getElementById('reg-password').addEventListener('input', function() {
+  var pw = this.value;
+  var bar = document.getElementById('pw-bar');
+  var hint = document.getElementById('pw-hint');
+  var nextBtn = document.getElementById('step1-next-btn');
+  var strength = 0;
+  if (pw.length >= 8) strength++;
+  if (/[A-Z]/.test(pw)) strength++;
+  if (/[0-9]/.test(pw)) strength++;
+  if (/[^A-Za-z0-9]/.test(pw)) strength++;
+  var colors = ['','#D32F2F','#FF9800','#FFC107','#2E7D32'];
+  var labels = ['','Too short','Weak','Fair','Strong'];
+  bar.style.width = (strength * 25) + '%';
+  bar.style.background = colors[strength] || '#eee';
+  hint.textContent = 'Password strength: ' + (labels[strength] || '—');
+  // Enable next only if Google auth done AND pw >= 8
+  var googleDone = !!window._googleAuthed;
+  nextBtn.disabled = !(googleDone && pw.length >= 8);
 });
 </script>
 
-<!-- Firebase-dependent logic loads after dropdowns are ready -->
+<!-- ── Firebase logic ───────────────────────────────────────── -->
 <script type="module" src="js/register.js"></script>
 
 </body>
