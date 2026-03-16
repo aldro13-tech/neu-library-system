@@ -13,7 +13,10 @@
       gap: 10px;
       margin-bottom: 18px;
     }
+
+    /* Hide the real checkbox */
     .purpose-option { display: none; }
+
     .purpose-label {
       display: flex;
       flex-direction: column;
@@ -30,19 +33,59 @@
       font-weight: 600;
       color: var(--gray-700);
       background: var(--gray-100);
+      position: relative;
     }
+
     .purpose-label:hover {
       border-color: var(--blue-mid);
       background: var(--blue-pale);
       color: var(--blue-dark);
     }
+
+    /* Selected state */
     .purpose-option:checked + .purpose-label {
       border-color: var(--blue-dark);
       background: var(--blue-dark);
       color: var(--white);
       box-shadow: 0 4px 12px rgba(10,36,99,0.22);
     }
+
+    /* Checkmark badge on selected */
+    .purpose-option:checked + .purpose-label::after {
+      content: '✓';
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 0.7rem;
+      font-weight: 900;
+      background: var(--gold);
+      color: var(--blue-dark);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 16px;
+    }
+
     .purpose-icon { font-size: 1.5rem; line-height: 1; }
+
+    .selection-hint {
+      font-size: 0.78rem;
+      color: var(--gray-400);
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .selected-count {
+      font-size: 0.78rem;
+      color: var(--blue-mid);
+      font-weight: 600;
+      margin-top: 6px;
+      margin-bottom: 4px;
+      min-height: 18px;
+    }
   </style>
 </head>
 <body>
@@ -81,45 +124,47 @@
 
         <div class="form-group">
           <label>Purpose of Visit <span class="req">*</span></label>
+          <p class="selection-hint">You may select more than one.</p>
+
           <div class="purpose-grid">
 
-            <input type="radio" name="purpose-radio" id="p1" class="purpose-option"
-              value="Reading / Browsing Books" />
+            <input type="checkbox" name="purpose-check" id="p1"
+              class="purpose-option" value="Reading / Browsing Books" />
             <label for="p1" class="purpose-label">
               <span class="purpose-icon">📖</span>
               Reading / Browsing
             </label>
 
-            <input type="radio" name="purpose-radio" id="p2" class="purpose-option"
-              value="Research / Thesis Work" />
+            <input type="checkbox" name="purpose-check" id="p2"
+              class="purpose-option" value="Research / Thesis Work" />
             <label for="p2" class="purpose-label">
               <span class="purpose-icon">🔬</span>
               Research / Thesis
             </label>
 
-            <input type="radio" name="purpose-radio" id="p3" class="purpose-option"
-              value="Use of Library Computer" />
+            <input type="checkbox" name="purpose-check" id="p3"
+              class="purpose-option" value="Use of Library Computer" />
             <label for="p3" class="purpose-label">
               <span class="purpose-icon">💻</span>
               Use of Computer
             </label>
 
-            <input type="radio" name="purpose-radio" id="p4" class="purpose-option"
-              value="Doing Assignments / Schoolwork" />
+            <input type="checkbox" name="purpose-check" id="p4"
+              class="purpose-option" value="Doing Assignments / Schoolwork" />
             <label for="p4" class="purpose-label">
               <span class="purpose-icon">✏️</span>
               Assignments
             </label>
 
-            <input type="radio" name="purpose-radio" id="p5" class="purpose-option"
-              value="Borrowing / Returning Books" />
+            <input type="checkbox" name="purpose-check" id="p5"
+              class="purpose-option" value="Borrowing / Returning Books" />
             <label for="p5" class="purpose-label">
               <span class="purpose-icon">📚</span>
               Borrow / Return
             </label>
 
-            <input type="radio" name="purpose-radio" id="p6" class="purpose-option"
-              value="Group Study" />
+            <input type="checkbox" name="purpose-check" id="p6"
+              class="purpose-option" value="Group Study" />
             <label for="p6" class="purpose-label">
               <span class="purpose-icon">👥</span>
               Group Study
@@ -127,8 +172,7 @@
 
           </div>
 
-          <!-- Hidden select mirrors the radio selection -->
-          <select id="purpose" name="purpose" style="display:none"></select>
+          <div class="selected-count" id="selected-count"></div>
         </div>
 
         <button class="btn btn-gold" type="submit" id="submit-btn">
@@ -149,10 +193,17 @@
 
 </div>
 
-<script type="module">
-  document.querySelectorAll('input[name="purpose-radio"]').forEach((radio) => {
-    radio.addEventListener('change', () => {
-      document.getElementById('purpose').value = radio.value;
+<!-- Show live count of selected purposes -->
+<script>
+  document.querySelectorAll('input[name="purpose-check"]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      var checked = document.querySelectorAll('input[name="purpose-check"]:checked');
+      var countEl = document.getElementById('selected-count');
+      if (countEl) {
+        countEl.textContent = checked.length > 0
+          ? checked.length + ' purpose' + (checked.length > 1 ? 's' : '') + ' selected'
+          : '';
+      }
     });
   });
 </script>

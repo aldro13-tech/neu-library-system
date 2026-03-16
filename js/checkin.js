@@ -1,5 +1,5 @@
 // ============================================================
-// checkin.js
+// checkin.js — multiple purpose selection via checkboxes
 // ============================================================
 
 import {
@@ -11,13 +11,11 @@ import {
 } from "./firebase-config.js";
 import { requireAuth, logout } from "./auth.js";
 
-// ── Main ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", async () => {
   let currentUser, userData;
 
   try {
-    // ── Use null so BOTH visitors and admins can access ──────
-    // Passing "visitor" was causing admins to get redirected
+    // null = allow both visitors AND admins
     const result = await requireAuth(null);
     currentUser = result.user;
     userData    = result.userData;
@@ -25,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Fill in user info display bar
+  // ── Fill user info bar ────────────────────────────────────
   const nameEl   = document.getElementById("user-name");
   const idEl     = document.getElementById("user-id");
   const avatarEl = document.getElementById("user-avatar");
@@ -35,16 +33,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (avatarEl && userData.photoURL) avatarEl.src = userData.photoURL;
 
   // ── Logout ────────────────────────────────────────────────
-  const logoutBtn = document.getElementById("logout-btn");
-  if (logoutBtn) logoutBtn.addEventListener("click", logout);
-
-  // ── Sync radio buttons → hidden <select #purpose> ─────────
-  document.querySelectorAll('input[name="purpose-radio"]').forEach((radio) => {
-    radio.addEventListener("change", () => {
-      const sel = document.getElementById("purpose");
-      if (sel) sel.value = radio.value;
-    });
-  });
+  document.getElementById("logout-btn")
+    ?.addEventListener("click", logout);
 
   // ── Form submit ───────────────────────────────────────────
   const form     = document.getElementById("checkin-form");
@@ -55,11 +45,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
     if (errorMsg) errorMsg.style.display = "none";
 
-    const purpose = document.getElementById("purpose")?.value;
+    // Collect ALL checked purposes
+    const checked = Array.from(
+      document.querySelectorAll('input[name="purpose-check"]:checked')
+    ).map(cb => cb.value);
 
-    if (!purpose) {
+    if (checked.length === 0) {
       if (errorMsg) {
-        errorMsg.textContent = "Please select your purpose of visit.";
+        errorMsg.textContent   = "Please select at least one purpose of visit.";
         errorMsg.style.display = "block";
       }
       return;
@@ -72,6 +65,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
+      // Join multiple purposes with " | " for readable storage
+      const purposeString = checked.join(" | ");
+
       const visitData = {
         uid:         currentUser.uid,
         email:       currentUser.email,
@@ -79,7 +75,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         schoolId:    userData.schoolId    || "",
         college:     userData.college     || "",
         program:     userData.program     || "",
-        purpose,
+        purpose:     purposeString,
+        purposes:    checked,            // also store as array for filtering
         checkInTime: serverTimestamp(),
         date:        new Date().toISOString().split("T")[0],
       };
@@ -90,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       sessionStorage.setItem("visitData", JSON.stringify({
         displayName: visitData.displayName,
         college:     visitData.college,
-        purpose:     visitData.purpose,
+        purpose:     purposeString,
         schoolId:    visitData.schoolId,
       }));
 
