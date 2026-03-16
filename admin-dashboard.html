@@ -92,33 +92,51 @@
 <main class="main-content">
 
   <!-- Top Bar -->
-  <div class="top-bar">
-    <div class="top-bar-title">📊 Visitor Statistics Dashboard</div>
+  <div class="filter-group">
+    <select class="filter-select" id="date-filter">
+      <option value="today">Today</option>
+      <option value="week">This Week</option>
+      <option value="month" selected>This Month</option>
+      <option value="custom">Custom Range</option>
+    </select>
 
-    <div class="filter-group">
-      <select class="filter-select" id="date-filter">
-        <option value="today">Today</option>
-        <option value="week">This Week</option>
-        <option value="month" selected>This Month</option>
-        <option value="custom">Custom Range</option>
-      </select>
-
-      <div class="custom-range" id="custom-range">
-        <input type="date" class="date-input" id="date-from" />
-        <span style="font-size:0.8rem; color:#999;">to</span>
-        <input type="date" class="date-input" id="date-to" />
-        <button class="btn-apply" id="apply-custom">Apply</button>
-      </div>
-
-      <button class="btn-pdf" id="pdf-export-btn">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Export PDF
-      </button>
+    <div class="custom-range" id="custom-range">
+      <input type="date" class="date-input" id="date-from" />
+      <span style="font-size:0.8rem; color:#999;">to</span>
+      <input type="date" class="date-input" id="date-to" />
+      <button class="btn-apply" id="apply-custom">Apply</button>
     </div>
+
+    <select class="filter-select" id="filter-purpose">
+      <option value="">All Purposes</option>
+      <option value="Reading / Browsing Books">Reading / Browsing</option>
+      <option value="Research / Thesis Work">Research / Thesis</option>
+      <option value="Use of Library Computer">Use of Computer</option>
+      <option value="Doing Assignments / Schoolwork">Assignments</option>
+      <option value="Borrowing / Returning Books">Borrow / Return</option>
+      <option value="Group Study">Group Study</option>
+    </select>
+
+    <select class="filter-select" id="filter-college">
+      <option value="">All Colleges</option>
+    </select>
+
+    <select class="filter-select" id="filter-visitor-type">
+      <option value="">All Visitors</option>
+      <option value="student">Students</option>
+      <option value="faculty">Faculty</option>
+      <option value="staff">Staff</option>
+    </select>
+
+    <button class="btn-pdf" id="pdf-export-btn">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
+        stroke="currentColor" stroke-width="2.2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Export PDF
+    </button>
   </div>
 
   <!-- Dashboard body -->

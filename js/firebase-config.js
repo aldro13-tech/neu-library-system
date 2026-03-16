@@ -48,7 +48,10 @@ const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ hd: "neu.edu.ph" });
 
 const ALLOWED_DOMAIN = "@neu.edu.ph";
-const ADMIN_EMAILS = ["aldronathaniel.altar@neu.edu.ph"]; // Add admin emails here
+const ADMIN_EMAILS = [
+  "aldronathaniel.altar@neu.edu.ph",
+  "jcesperanza@neu.edu.ph"
+]; // Add admin emails here
 
 export {
   auth,

@@ -2,6 +2,8 @@
 
 A digital logbook web application for tracking and analyzing library visits at **New Era University**. Built with vanilla HTML, CSS, and JavaScript — powered by **Firebase** (Authentication + Firestore).
 
+## 🌐 Live Application
+👉 **https://aldro13-tech.github.io/neu-library-system/**
 ---
 
 ## 🗂️ Project File Structure
