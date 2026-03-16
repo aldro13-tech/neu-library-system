@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (snap.exists() && snap.data().isProfileComplete) {
       const data = snap.data();
       window.location.href = data.role === "admin"
-        ? "admin-dashboard.html"
+        ? "role-select.html"
         : "checkin.html";
     }
   });
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const snap = await getDoc(doc(db, "users", user.uid));
         const data = snap.data();
         window.location.href = data.role === "admin"
-          ? "admin-dashboard.html"
+          ? "role-select.html"
           : "checkin.html";
 
       } catch (err) {
