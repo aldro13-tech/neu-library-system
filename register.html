@@ -7,12 +7,10 @@
   <link rel="stylesheet" href="css/main.css" />
   <link rel="icon" href="assets/neu-logo.png" />
   <style>
-    /* Step indicators */
     .reg-steps {
       display: flex;
       align-items: center;
-      gap: 0;
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
     .reg-step {
       display: flex;
@@ -26,16 +24,13 @@
       border-radius: 50%;
       background: var(--gray-200);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.72rem; font-weight: 700; color: var(--gray-400);
+      font-size: 0.72rem; font-weight: 700;
+      color: var(--gray-400);
       transition: all 0.3s ease;
       position: relative; z-index: 1;
     }
-    .reg-step-dot.active {
-      background: var(--blue-dark); color: var(--white);
-    }
-    .reg-step-dot.done {
-      background: var(--gold); color: var(--blue-dark);
-    }
+    .reg-step-dot.active { background: var(--blue-dark); color: var(--white); }
+    .reg-step-dot.done   { background: var(--gold); color: var(--blue-dark); }
     .reg-step-label {
       font-size: 0.65rem; color: var(--gray-400);
       text-align: center; font-weight: 600;
@@ -48,24 +43,18 @@
     }
     .reg-step-line.done { background: var(--gold); }
 
-    /* Step panels */
     .reg-panel { display: none; }
     .reg-panel.active { display: block; }
 
-    /* Google authenticated bar */
     .auth-bar {
       display: flex; align-items: center; gap: 12px;
-      background: #E8F5E9;
-      border: 1px solid #C8E6C9;
+      background: #E8F5E9; border: 1px solid #C8E6C9;
       border-radius: var(--radius-sm);
-      padding: 10px 14px;
-      margin-bottom: 18px;
+      padding: 10px 14px; margin-bottom: 18px;
     }
-    .auth-bar-icon { font-size: 1.1rem; flex-shrink: 0; }
-    .auth-bar-text { font-size: 0.83rem; color: #2E7D32; font-weight: 600; }
+    .auth-bar-text  { font-size: 0.83rem; color: #2E7D32; font-weight: 600; }
     .auth-bar-email { font-size: 0.78rem; color: #555; }
 
-    /* Password strength */
     .pw-strength {
       height: 4px; border-radius: 2px;
       background: var(--gray-200);
@@ -82,7 +71,6 @@
 <body>
 
 <div class="page-wrapper">
-
   <aside class="left-panel">
     <div class="left-panel-inner">
 
@@ -112,26 +100,32 @@
 
       <div class="error-msg" id="error-msg" role="alert"></div>
 
-      <!-- ══ STEP 1: Google sign-in ══════════════════════════ -->
+      <!-- ══ STEP 1 ══════════════════════════════════════════ -->
       <div class="reg-panel active" id="step-1">
-        <p style="font-size:0.88rem;color:var(--gray-400);margin-bottom:20px;line-height:1.6;">
-          First, verify your NEU Google account. This confirms your identity
-          and pre-fills your email.
-        </p>
 
+        <!-- Google option -->
         <button class="btn btn-google" id="google-reg-btn" type="button">
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
             width="18" height="18" alt="Google"/>
           Continue with Google (@neu.edu.ph)
         </button>
 
-        <div class="divider">then set a password below</div>
+        <div class="divider">or enter your email</div>
+
+        <!-- Manual email option -->
+        <div class="form-group">
+          <label for="reg-email">Institutional Email <span class="req">*</span></label>
+          <input type="email" id="reg-email"
+            placeholder="juan@neu.edu.ph" autocomplete="email" />
+        </div>
 
         <div class="form-group">
           <label for="reg-password">Set Password <span class="req">*</span></label>
           <input type="password" id="reg-password"
             placeholder="Min. 8 characters" autocomplete="new-password" />
-          <div class="pw-strength"><div class="pw-strength-bar" id="pw-bar"></div></div>
+          <div class="pw-strength">
+            <div class="pw-strength-bar" id="pw-bar"></div>
+          </div>
           <div class="pw-hint" id="pw-hint">Password strength: —</div>
         </div>
 
@@ -141,24 +135,22 @@
             placeholder="Re-enter your password" autocomplete="new-password" />
         </div>
 
-        <button class="btn btn-primary" id="step1-next-btn" type="button" disabled>
+        <button class="btn btn-primary" id="step1-next-btn" type="button">
           Next: Complete Profile →
         </button>
 
         <footer class="page-footer" style="margin-top:20px;">
-          Already have an account?
-          <a href="index.html">Sign in here</a>
+          Already have an account? <a href="index.html">Sign in here</a>
         </footer>
       </div>
 
-      <!-- ══ STEP 2: Profile form ════════════════════════════ -->
+      <!-- ══ STEP 2 ══════════════════════════════════════════ -->
       <div class="reg-panel" id="step-2">
 
-        <!-- Authenticated user bar -->
-        <div class="auth-bar" id="auth-bar">
-          <span class="auth-bar-icon">✅</span>
+        <div class="auth-bar">
+          <span style="font-size:1.1rem">✅</span>
           <div>
-            <div class="auth-bar-text">Google account verified</div>
+            <div class="auth-bar-text">Email verified</div>
             <div class="auth-bar-email" id="auth-bar-email">—</div>
           </div>
         </div>
@@ -206,8 +198,7 @@
         </form>
 
         <footer class="page-footer" style="margin-top:20px;">
-          Already have an account?
-          <a href="index.html">Sign in here</a>
+          Already have an account? <a href="index.html">Sign in here</a>
         </footer>
       </div>
 
@@ -221,20 +212,19 @@
         or with your email and password anytime.</p>
     </div>
   </section>
-
 </div>
 
-<!-- ── Colleges dropdown (plain script, no Firebase) ───────── -->
+<!-- ── College dropdowns (plain script) ─────────────────────── -->
 <script>
 const COLLEGES = {
   "College of Accountancy":["Bachelor of Science in Accountancy"],
   "College of Agriculture":["Bachelor of Science in Agriculture"],
   "College of Arts and Sciences":["Bachelor of Arts in Economics","Bachelor of Arts in Political Science","Bachelor of Science in Biology","Bachelor of Science in Psychology","Bachelor of Public Administration"],
-  "College of Business Administration":["BS in Business Administration – Major in Financial Management","BS in Business Administration – Major in Human Resource Development Management","BS in Business Administration – Major in Legal Management","BS in Business Administration – Major in Marketing Management","Bachelor of Science in Entrepreneurship","Bachelor of Science in Real Estate Management"],
+  "College of Business Administration":["BS in Business Administration – Major in Financial Management","BS in Business Administration – Major in HRDM","BS in Business Administration – Major in Legal Management","BS in Business Administration – Major in Marketing Management","Bachelor of Science in Entrepreneurship","Bachelor of Science in Real Estate Management"],
   "College of Communication":["Bachelor of Arts in Broadcasting","Bachelor of Arts in Communication","Bachelor of Arts in Journalism"],
-  "College of Informatics and Computing Studies (CICS)":["Bachelor of Science in Information Technology","Bachelor of Science in Computer Science","Bachelor of Science in Information Systems","Bachelor of Library and Information Science","BS in Entertainment and Multimedia Computing – Digital Animation Technology","BS in Entertainment and Multimedia Computing – Game Development"],
+  "College of Informatics and Computing Studies (CICS)":["Bachelor of Science in Information Technology","Bachelor of Science in Computer Science","Bachelor of Science in Information Systems","Bachelor of Library and Information Science","BS in EMC – Digital Animation Technology","BS in EMC – Game Development"],
   "College of Criminology":["Bachelor of Science in Criminology"],
-  "College of Education":["Bachelor of Elementary Education – General","Bachelor of Elementary Education – Preschool Education","Bachelor of Elementary Education – Special Education","Bachelor of Secondary Education – English","Bachelor of Secondary Education – Filipino","Bachelor of Secondary Education – Mathematics","Bachelor of Secondary Education – Science","Bachelor of Secondary Education – Social Studies","Bachelor of Secondary Education – MAPEH","Bachelor of Secondary Education – Technology and Livelihood Education"],
+  "College of Education":["BEEd – General","BEEd – Preschool Education","BEEd – Special Education","BSEd – English","BSEd – Filipino","BSEd – Mathematics","BSEd – Science","BSEd – Social Studies","BSEd – MAPEH","BSEd – Technology and Livelihood Education"],
   "College of Engineering and Architecture":["Bachelor of Science in Architecture","Bachelor of Science in Astronomy","Bachelor of Science in Civil Engineering","Bachelor of Science in Electrical Engineering","Bachelor of Science in Electronics Engineering","Bachelor of Science in Industrial Engineering","Bachelor of Science in Mechanical Engineering"],
   "College of Medical Technology":["Bachelor of Science in Medical Technology"],
   "College of Midwifery":["Diploma in Midwifery"],
@@ -254,46 +244,36 @@ window.COLLEGES = COLLEGES;
 (function(){
   var sel = document.getElementById('college');
   if (!sel) return;
-  Object.keys(COLLEGES).forEach(function(col) {
-    var opt = document.createElement('option');
-    opt.value = col; opt.textContent = col;
-    sel.appendChild(opt);
+  Object.keys(COLLEGES).forEach(function(col){
+    var o = document.createElement('option'); o.value=col; o.textContent=col; sel.appendChild(o);
   });
 })();
 
-document.getElementById('college').addEventListener('change', function() {
+document.getElementById('college').addEventListener('change', function(){
   var pSel = document.getElementById('program');
   pSel.innerHTML = '<option value="">Select Program / Course</option>';
-  if (!this.value) { pSel.disabled = true; return; }
-  (COLLEGES[this.value]||[]).forEach(function(p) {
-    var o = document.createElement('option'); o.value=p; o.textContent=p; pSel.appendChild(o);
+  if (!this.value){ pSel.disabled=true; return; }
+  (COLLEGES[this.value]||[]).forEach(function(p){
+    var o=document.createElement('option'); o.value=p; o.textContent=p; pSel.appendChild(o);
   });
   pSel.disabled = false;
 });
 
 // Password strength meter
-document.getElementById('reg-password').addEventListener('input', function() {
-  var pw = this.value;
-  var bar = document.getElementById('pw-bar');
-  var hint = document.getElementById('pw-hint');
-  var nextBtn = document.getElementById('step1-next-btn');
-  var strength = 0;
-  if (pw.length >= 8) strength++;
-  if (/[A-Z]/.test(pw)) strength++;
-  if (/[0-9]/.test(pw)) strength++;
-  if (/[^A-Za-z0-9]/.test(pw)) strength++;
-  var colors = ['','#D32F2F','#FF9800','#FFC107','#2E7D32'];
-  var labels = ['','Too short','Weak','Fair','Strong'];
-  bar.style.width = (strength * 25) + '%';
-  bar.style.background = colors[strength] || '#eee';
-  hint.textContent = 'Password strength: ' + (labels[strength] || '—');
-  // Enable next only if Google auth done AND pw >= 8
-  var googleDone = !!window._googleAuthed;
-  nextBtn.disabled = !(googleDone && pw.length >= 8);
+document.getElementById('reg-password').addEventListener('input', function(){
+  var pw=this.value, s=0;
+  if(pw.length>=8) s++;
+  if(/[A-Z]/.test(pw)) s++;
+  if(/[0-9]/.test(pw)) s++;
+  if(/[^A-Za-z0-9]/.test(pw)) s++;
+  var cols=['','#D32F2F','#FF9800','#FFC107','#2E7D32'];
+  var labs=['','Too short','Weak','Fair','Strong'];
+  document.getElementById('pw-bar').style.width=(s*25)+'%';
+  document.getElementById('pw-bar').style.background=cols[s]||'#eee';
+  document.getElementById('pw-hint').textContent='Password strength: '+(labs[s]||'—');
 });
 </script>
 
-<!-- ── Firebase logic ───────────────────────────────────────── -->
 <script type="module" src="js/register.js"></script>
 
 </body>
