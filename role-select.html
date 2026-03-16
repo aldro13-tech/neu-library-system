@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEU Library – Choose Role</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="icon" href="assets/neu-logo.png" />
+  <style>
+    .role-page {
+      min-height: 100vh;
+      background: var(--blue-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .role-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 48px 52px;
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .role-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--blue-dark), var(--blue-light), var(--gold));
+    }
+
+    .role-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 20px;
+      display: block;
+      border: 3px solid var(--gold);
+    }
+
+    .role-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 6px;
+    }
+
+    .role-subtitle {
+      font-size: 0.9rem;
+      color: var(--gray-400);
+      margin-bottom: 8px;
+    }
+
+    .user-greeting {
+      display: inline-block;
+      background: var(--blue-pale);
+      color: var(--blue-dark);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 36px;
+      border: 1px solid rgba(10,36,99,0.15);
+    }
+
+    .role-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .role-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 28px 20px;
+      border: 2.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      background: var(--gray-100);
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: var(--font-body);
+      text-decoration: none;
+    }
+
+    .role-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(10,36,99,0.15);
+    }
+
+    .role-btn.admin-btn {
+      border-color: var(--gold);
+      background: var(--gold-light);
+    }
+
+    .role-btn.admin-btn:hover {
+      background: var(--gold);
+      border-color: var(--gold-dark);
+    }
+
+    .role-btn.visitor-btn {
+      border-color: var(--blue-mid);
+      background: var(--blue-pale);
+    }
+
+    .role-btn.visitor-btn:hover {
+      background: var(--blue-dark);
+      border-color: var(--blue-dark);
+    }
+
+    .role-btn.visitor-btn:hover .role-btn-title,
+    .role-btn.visitor-btn:hover .role-btn-desc {
+      color: var(--white);
+    }
+
+    .role-icon {
+      font-size: 2.4rem;
+      line-height: 1;
+    }
+
+    .role-btn-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      transition: color 0.22s ease;
+    }
+
+    .role-btn-desc {
+      font-size: 0.78rem;
+      color: var(--gray-400);
+      transition: color 0.22s ease;
+    }
+
+    .role-btn.admin-btn:hover .role-btn-title {
+      color: var(--blue-dark);
+    }
+
+    .signout-link {
+      font-size: 0.83rem;
+      color: var(--gray-400);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .signout-link:hover { color: var(--red-err); }
+
+    @media (max-width: 480px) {
+      .role-card { padding: 36px 24px; }
+      .role-options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="role-page">
+  <div class="role-card">
+
+    <img src="assets/neu-logo.png" alt="NEU Logo" class="role-logo"
+      onerror="this.style.display='none'" />
+
+    <h1 class="role-title">How are you entering?</h1>
+    <p class="role-subtitle">Choose how you'd like to use the library system today.</p>
+
+    <span class="user-greeting" id="user-greeting">Loading…</span>
+
+    <div class="role-options">
+
+      <!-- Admin mode -->
+      <a class="role-btn admin-btn" href="admin-dashboard.html">
+        <span class="role-icon">📊</span>
+        <span class="role-btn-title">Admin Dashboard</span>
+        <span class="role-btn-desc">View stats, manage users,<br/>export reports</span>
+      </a>
+
+      <!-- Visitor mode -->
+      <a class="role-btn visitor-btn" href="checkin.html">
+        <span class="role-icon">🚶</span>
+        <span class="role-btn-title">Visit the Library</span>
+        <span class="role-btn-desc">Check in as a visitor<br/>and log your visit</span>
+      </a>
+
+    </div>
+
+    <a class="signout-link" id="signout-btn">← Sign out and use a different account</a>
+
+  </div>
+</div>
+
+<script type="module">
+  import {
+    auth,
+    db,
+    onAuthStateChanged,
+    doc,
+    getDoc,
+    signOut,
+  } from './js/firebase-config.js';
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    // Fetch user data
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists()) {
+      window.location.href = 'register.html';
+      return;
+    }
+
+    const data = snap.data();
+
+    // Only admins should be on this page
+    if (data.role !== 'admin') {
+      window.location.href = 'checkin.html';
+      return;
+    }
+
+    // Show greeting
+    const greetingEl = document.getElementById('user-greeting');
+    if (greetingEl) {
+      greetingEl.textContent = `👋 Hello, ${data.displayName || user.email}`;
+    }
+  });
+
+  // Sign out
+  document.getElementById('signout-btn').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = 'index.html';
+  });
+</script>
+
+</body>
+</html>

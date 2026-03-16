@@ -80,7 +80,7 @@ export async function loginWithGoogle() {
 
     // 5. Role-based redirect
     if (userData.role === "admin") {
-      window.location.href = "admin-dashboard.html";
+      window.location.href = "role-select.html";
     } else {
       window.location.href = "checkin.html";
     }
@@ -127,7 +127,7 @@ export function requireAuth(allowedRole = null) {
         return;
       }
       if (allowedRole && data.role !== allowedRole) {
-        window.location.href = data.role === "admin" ? "admin-dashboard.html" : "checkin.html";
+        window.location.href = data.role === "admin" ? "role-select.html" : "checkin.html";
         reject("Wrong role");
         return;
       }
