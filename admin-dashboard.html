@@ -252,6 +252,78 @@
   </div><!-- /.dashboard-body -->
 </main>
 
+<!-- ── User Visit Log Modal ─────────────────────────────────── -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-header-name" id="modal-user-name">—</div>
+        <div class="modal-header-meta" id="modal-user-email">—</div>
+        <div class="modal-header-college" id="modal-user-college">—</div>
+      </div>
+      <div class="modal-header-actions">
+        <button class="modal-pdf-btn" id="modal-pdf-btn">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export PDF
+        </button>
+        <button class="modal-close-btn" id="modal-close-btn">✕</button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <!-- Mini stat cards -->
+      <div class="modal-stats-row">
+        <div class="modal-stat">
+          <div class="modal-stat-value" id="modal-stat-total">—</div>
+          <div class="modal-stat-label">Total Visits</div>
+        </div>
+        <div class="modal-stat" style="border-left-color:var(--gold)">
+          <div class="modal-stat-value" id="modal-stat-last">—</div>
+          <div class="modal-stat-label">Last Visit</div>
+        </div>
+        <div class="modal-stat" style="border-left-color:var(--green)">
+          <div class="modal-stat-value" id="modal-stat-purpose">—</div>
+          <div class="modal-stat-label">Top Purpose</div>
+        </div>
+      </div>
+
+      <!-- Visit history table -->
+      <div class="table-scroll">
+        <table class="visit-table" id="modal-visit-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Purpose</th>
+              <th>Check-in Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="modal-visit-body">
+            <tr><td colspan="4" class="no-data">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .type-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+  .type-badge.student { background: #E8F0FE; color: #1A4B9B; }
+  .type-badge.faculty { background: #FFF9E0; color: #D4A200; }
+  .type-badge.staff   { background: #F3E5F5; color: #7B1FA2; }
+</style>
+
 <!-- Admin dashboard JS -->
 <script type="module">
   import { allVisits, aggregateByCollege, aggregateByPurpose } from './js/admin-dashboard.js';

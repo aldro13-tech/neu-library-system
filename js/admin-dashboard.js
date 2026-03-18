@@ -367,14 +367,22 @@ function renderUserResults(users) {
         </button>
       </div>
     `;
+
+    // Click card body (not the block button) → open modal
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".block-btn")) return;
+      openUserModal(u);
+    });
+
     container.appendChild(card);
   });
 
   container.querySelectorAll(".block-btn").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const uid             = btn.dataset.uid;
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const uid              = btn.dataset.uid;
       const currentlyBlocked = btn.dataset.blocked === "true";
-      btn.disabled  = true;
+      btn.disabled    = true;
       btn.textContent = "Updating…";
       try {
         await updateDoc(doc(db, "users", uid), { isBlocked: !currentlyBlocked });
@@ -385,6 +393,170 @@ function renderUserResults(users) {
       }
     });
   });
+}
+
+// ── User visit modal ──────────────────────────────────────────
+let modalUserData   = null;
+let modalUserVisits = [];
+
+async function openUserModal(userData) {
+  modalUserData = userData;
+
+  // Fill header
+  document.getElementById("modal-user-name").textContent   = userData.displayName || "No Name";
+  document.getElementById("modal-user-email").textContent  = userData.email;
+  document.getElementById("modal-user-college").textContent = userData.college || "Unknown";
+  document.getElementById("modal-visit-body").innerHTML    =
+    `<tr><td colspan="4" class="no-data">Loading visits…</td></tr>`;
+  document.getElementById("modal-stat-total").textContent   = "…";
+  document.getElementById("modal-stat-last").textContent    = "…";
+  document.getElementById("modal-stat-purpose").textContent = "…";
+
+  // Open modal
+  document.getElementById("user-modal").classList.add("open");
+
+  // Fetch this user's visits
+  try {
+    const q    = query(
+      collection(db, "visits"),
+      where("uid", "==", userData.id),
+      orderBy("checkInTime", "desc")
+    );
+    const snap = await getDocs(q);
+    modalUserVisits = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderModalVisits(modalUserVisits);
+  } catch (err) {
+    console.error("Modal fetch error:", err);
+    document.getElementById("modal-visit-body").innerHTML =
+      `<tr><td colspan="4" class="no-data">Failed to load visits.</td></tr>`;
+  }
+}
+
+function renderModalVisits(visits) {
+  // Stat cards
+  document.getElementById("modal-stat-total").textContent = visits.length;
+
+  if (visits.length > 0) {
+    const last = visits[0].checkInTime?.toDate
+      ? visits[0].checkInTime.toDate().toLocaleDateString("en-PH")
+      : "—";
+    document.getElementById("modal-stat-last").textContent = last;
+
+    const purposeCounts = {};
+    visits.forEach((v) => {
+      const p = v.purpose || "Unknown";
+      purposeCounts[p] = (purposeCounts[p] || 0) + 1;
+    });
+    const top = Object.entries(purposeCounts).sort((a, b) => b[1] - a[1])[0];
+    const topLabel = top ? top[0].split(" | ")[0] : "—"; // show first purpose if multiple
+    document.getElementById("modal-stat-purpose").textContent = topLabel;
+  } else {
+    document.getElementById("modal-stat-last").textContent    = "—";
+    document.getElementById("modal-stat-purpose").textContent = "—";
+  }
+
+  // Table
+  const tbody = document.getElementById("modal-visit-body");
+  tbody.innerHTML = "";
+  if (visits.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="no-data">No visits recorded yet.</td></tr>`;
+    return;
+  }
+  visits.forEach((v) => {
+    const time = v.checkInTime?.toDate
+      ? v.checkInTime.toDate().toLocaleString("en-PH") : "—";
+    const dateOnly = v.date || "—";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${dateOnly}</td>
+      <td>${v.purpose || "—"}</td>
+      <td>${time}</td>
+      <td><span class="visit-badge">Logged</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function closeUserModal() {
+  document.getElementById("user-modal").classList.remove("open");
+  modalUserData   = null;
+  modalUserVisits = [];
+}
+
+function generateUserPDF() {
+  if (!modalUserData || !window.jspdf) return;
+  const { jsPDF } = window.jspdf;
+  const pdoc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const NOW  = new Date().toLocaleString("en-PH", { dateStyle: "long", timeStyle: "short" });
+
+  // Header
+  pdoc.setFillColor(10, 36, 99);
+  pdoc.rect(0, 0, 210, 28, "F");
+  pdoc.setFillColor(249, 198, 31);
+  pdoc.rect(0, 28, 210, 3, "F");
+  pdoc.setFont("helvetica", "bold");
+  pdoc.setFontSize(14);
+  pdoc.setTextColor(255, 255, 255);
+  pdoc.text("NEW ERA UNIVERSITY LIBRARY", 105, 11, { align: "center" });
+  pdoc.setFontSize(9);
+  pdoc.setFont("helvetica", "normal");
+  pdoc.text("Individual Visitor Report", 105, 18, { align: "center" });
+  pdoc.text(`Generated: ${NOW}`, 105, 24, { align: "center" });
+
+  // User info block
+  pdoc.setTextColor(10, 36, 99);
+  pdoc.setFont("helvetica", "bold");
+  pdoc.setFontSize(12);
+  pdoc.text(modalUserData.displayName || "Unknown", 14, 40);
+  pdoc.setFont("helvetica", "normal");
+  pdoc.setFontSize(9);
+  pdoc.setTextColor(80, 80, 80);
+  pdoc.text(`Email: ${modalUserData.email}`, 14, 47);
+  pdoc.text(`College: ${modalUserData.college || "—"}`, 14, 53);
+  pdoc.text(`School ID: ${modalUserData.schoolId || "—"}`, 14, 59);
+  pdoc.text(`Total Visits: ${modalUserVisits.length}`, 14, 65);
+
+  // Divider
+  pdoc.setDrawColor(249, 198, 31);
+  pdoc.setLineWidth(0.5);
+  pdoc.line(14, 70, 196, 70);
+
+  // Visit log table
+  const rows = modalUserVisits.map((v) => [
+    v.date || "—",
+    v.purpose || "—",
+    v.checkInTime?.toDate
+      ? v.checkInTime.toDate().toLocaleString("en-PH") : "—",
+  ]);
+
+  pdoc.autoTable({
+    startY: 74,
+    head:   [["Date", "Purpose", "Check-in Time"]],
+    body:   rows,
+    theme:  "striped",
+    headStyles:         { fillColor: [10, 36, 99], textColor: 255, fontStyle: "bold", fontSize: 9 },
+    bodyStyles:         { fontSize: 8 },
+    alternateRowStyles: { fillColor: [245, 248, 255] },
+    margin: { left: 14, right: 14 },
+    columnStyles: { 0: { cellWidth: 28 }, 1: { cellWidth: 100 }, 2: { cellWidth: 50 } },
+  });
+
+  // Footer
+  const pages = pdoc.internal.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) {
+    pdoc.setPage(i);
+    pdoc.setFillColor(10, 36, 99);
+    pdoc.rect(0, 285, 210, 12, "F");
+    pdoc.setTextColor(255, 255, 255);
+    pdoc.setFontSize(7);
+    pdoc.text(
+      `NEU Library Visitor Management System  |  Page ${i} of ${pages}  |  Confidential`,
+      105, 292, { align: "center" }
+    );
+  }
+
+  const safe = (modalUserData.displayName || "visitor").replace(/\s+/g, "_");
+  pdoc.save(`NEU_Library_${safe}_visits.pdf`);
 }
 
 // ── Init ──────────────────────────────────────────────────────
@@ -422,6 +594,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => searchUsers(e.target.value.trim()), 400);
   });
+
+  // Modal close
+  document.getElementById("modal-close-btn").addEventListener("click", closeUserModal);
+  document.getElementById("user-modal").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeUserModal();
+  });
+
+  // Modal PDF
+  document.getElementById("modal-pdf-btn").addEventListener("click", generateUserPDF);
 
   await refreshDashboard();
 });
