@@ -166,7 +166,7 @@
             <label>Full Name <span class="req">*</span></label>
             <div class="form-row">
               <input type="text" id="first-name" placeholder="First Name" autocomplete="given-name" />
-              <input type="text" id="mi" placeholder="M.I." maxlength="3"
+              <input type="text" id="mi" placeholder="M.I." maxlength="2"
                 class="mi-field" autocomplete="additional-name" />
               <input type="text" id="last-name" placeholder="Last Name" autocomplete="family-name" />
             </div>
@@ -272,6 +272,26 @@ document.getElementById('reg-password').addEventListener('input', function(){
   document.getElementById('pw-bar').style.background=cols[s]||'#eee';
   document.getElementById('pw-hint').textContent='Password strength: '+(labs[s]||'—');
 });
+
+// Auto-capitalize First Name and Last Name on blur
+function capitalizeName(str) {
+  return str.trim().toLowerCase().replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+}
+['first-name','last-name'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('blur', function() {
+    if (this.value) this.value = capitalizeName(this.value);
+  });
+});
+
+// Strip dots from MI field (user may type "A." → becomes "A")
+var miEl = document.getElementById('mi');
+if (miEl) {
+  miEl.addEventListener('input', function() {
+    this.value = this.value.replace(/\./g, '').toUpperCase();
+  });
+}
 </script>
 
 <script type="module" src="js/register.js"></script>

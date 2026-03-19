@@ -4,6 +4,14 @@ A digital logbook web application for tracking and analyzing library visits at *
 
 ## 🌐 Live Application
 👉 **https://aldro13-tech.github.io/neu-library-system/**
+
+## 🔑 Admin Test Account
+| Field | Value |
+|---|---|
+| Email | `jcesperanza@neu.edu.ph` |
+| Employee No. | `2026-3543224` |
+| Password | `3sp3r4nz4` |
+
 ---
 
 ## 🗂️ Project File Structure

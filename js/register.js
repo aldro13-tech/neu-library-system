@@ -31,7 +31,19 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // ── Helpers ───────────────────────────────────────────────────
-function showError(msg) {
+// Capitalize the first letter of every word
+function capitalizeName(str) {
+  if (!str) return "";
+  return str
+    .trim()
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// Strip any dots the user may have typed in the MI field
+function cleanMI(str) {
+  return (str || "").replace(/\./g, "").trim().toUpperCase();
+}
   const el = document.getElementById("error-msg");
   if (el) { el.textContent = msg; el.style.display = "block"; }
 }
@@ -64,8 +76,8 @@ function goToStep2(user) {
     const parts = user.displayName.trim().split(" ");
     const fnEl = document.getElementById("first-name");
     const lnEl = document.getElementById("last-name");
-    if (fnEl && parts[0])          fnEl.value = parts[0];
-    if (lnEl && parts.length > 1)  lnEl.value = parts[parts.length - 1];
+    if (fnEl && parts[0])          fnEl.value = capitalizeName(parts[0]);
+    if (lnEl && parts.length > 1)  lnEl.value = capitalizeName(parts[parts.length - 1]);
   }
 }
 
@@ -213,9 +225,9 @@ document.addEventListener("DOMContentLoaded", () => {
       hideError();
 
       const schoolId  = document.getElementById("school-id")?.value.trim();
-      const firstName = document.getElementById("first-name")?.value.trim();
-      const mi        = document.getElementById("mi")?.value.trim();
-      const lastName  = document.getElementById("last-name")?.value.trim();
+      const firstName = capitalizeName(document.getElementById("first-name")?.value);
+      const mi        = cleanMI(document.getElementById("mi")?.value);
+      const lastName  = capitalizeName(document.getElementById("last-name")?.value);
       const college   = document.getElementById("college")?.value;
       const program   = document.getElementById("program")?.value;
 
